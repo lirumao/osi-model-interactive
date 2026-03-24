@@ -25,8 +25,10 @@ export function LayerBand({ layer, status, colorFrom, colorTo, replayKey = 0 }: 
     const content = contentRef.current
     if (!band || !collapsed || !content) return
 
+    let tl: gsap.core.Timeline
+
     if (status === 'active') {
-      const tl = gsap.timeline()
+      tl = gsap.timeline()
       tl.to(band, { height: 76, duration: 0.3, ease: 'power2.out' })
       tl.to(collapsed, { opacity: 0, duration: 0.15 }, 0)
       tl.fromTo(
@@ -36,11 +38,13 @@ export function LayerBand({ layer, status, colorFrom, colorTo, replayKey = 0 }: 
         0.15
       )
     } else {
-      gsap.timeline()
+      tl = gsap.timeline()
         .to(Array.from(content.children), { opacity: 0, duration: 0.15 }, 0)
         .to(band, { height: 20, duration: 0.25, ease: 'power2.in' }, 0)
         .to(collapsed, { opacity: 1, duration: 0.2 }, 0.1)
     }
+
+    return () => { tl.kill() }
   }, [status, replayKey])
 
   const bandOpacity = status === 'inactive' ? 0.35 : status === 'done' ? 0.65 : 1
