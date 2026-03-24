@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react'
 
 export type Phase = 'sending' | 'transmitting' | 'receiving' | 'complete'
 
-interface OsiState {
+export interface OsiState {
   phase: Phase
   /** 发送端当前激活层 index（0=L7, 6=L1）；7 = 全部完成 */
   senderActive: number
