@@ -1,10 +1,12 @@
+type HexColor = `#${string}`
+
 export interface OsiLayer {
   level: number
   name: string
   description: string
   protocols: string[]
-  senderColor: { from: string; to: string }
-  receiverColor: { from: string; to: string }
+  senderColor: { from: HexColor; to: HexColor }
+  receiverColor: { from: HexColor; to: HexColor }
 }
 
 // Index 0 = L7（应用层），Index 6 = L1（物理层）— 发送端顺序
@@ -61,4 +63,4 @@ export const OSI_LAYERS: OsiLayer[] = [
 ]
 
 // 接收端顺序：L1（index 0）→ L7（index 6）
-export const RECEIVER_LAYERS = [...OSI_LAYERS].reverse()
+export const RECEIVER_LAYERS: OsiLayer[] = [...OSI_LAYERS].reverse()
