@@ -2,25 +2,45 @@
 
 import { OSI_LAYERS } from '@/data/osi-layers'
 import { LayerBand } from './LayerBand'
+import type { EncapBlock } from './LayerBand'
 import { DataCore } from './DataCore'
 import type { Phase } from '@/hooks/useOsiState'
 
 interface Props {
-  activeIndex: number  // 0-6 = 当前激活层；7 = 全部完成
+  activeIndex: number
   onNext: () => void
   phase: Phase
+}
+
+/**
+ * 构建到第 layerIndex 层为止的水平封装方块
+ * 最新的头部在最左边，原始数据在最右边
+ * 例如 L5 active: [会话ID][SSL加密][HTTP请求]
+ */
+function buildBlocks(upTo: number): EncapBlock[] {
+  const blocks: EncapBlock[] = []
+  for (let i = upTo; i >= 0; i--) {
+    const l = OSI_LAYERS[i]
+    blocks.push({
+      label: l.encapsulation,
+      colorFrom: l.senderColor.from,
+      colorTo: l.senderColor.to,
+    })
+  }
+  return blocks
 }
 
 export function SenderColumn({ activeIndex, onNext, phase }: Props) {
   const canAdvance = phase === 'sending' && activeIndex < 7
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="text-[10px] font-semibold text-gray-400 mb-2 uppercase tracking-widest">
-        发送端
+    <div className="flex flex-col">
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-xs font-semibold text-gray-500 tracking-widest uppercase">发送端</span>
+        <div className="flex-1 h-px bg-gray-200" />
       </div>
       <DataCore variant="sender" />
-      <div className="flex flex-col flex-1 justify-end">
+      <div className="flex flex-col overflow-y-auto">
         {OSI_LAYERS.map((layer, i) => (
           <LayerBand
             key={layer.level}
@@ -28,6 +48,8 @@ export function SenderColumn({ activeIndex, onNext, phase }: Props) {
             status={i < activeIndex ? 'done' : i === activeIndex ? 'active' : 'inactive'}
             colorFrom={layer.senderColor.from}
             colorTo={layer.senderColor.to}
+            blocks={i === activeIndex ? buildBlocks(i) : []}
+            detail={i === activeIndex ? layer.encapDetail : undefined}
           />
         ))}
       </div>

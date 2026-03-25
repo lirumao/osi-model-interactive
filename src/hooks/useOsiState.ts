@@ -25,18 +25,16 @@ export function useOsiState() {
   const [state, setState] = useState<OsiState>(INITIAL)
 
   // 用户点击「下一层」（发送端）
+  // 当到达第 7 层时，自动进入传输阶段并开始播放动画
   const advanceSender = useCallback(() => {
     setState((prev) => {
       if (prev.phase !== 'sending') return prev
       const next = prev.senderActive + 1
-      if (next >= 7) return { ...prev, senderActive: 7, phase: 'transmitting' }
+      if (next >= 7) {
+        return { ...prev, senderActive: 7, phase: 'transmitting', transmitting: true }
+      }
       return { ...prev, senderActive: next }
     })
-  }, [])
-
-  // 用户点击「发送数据」
-  const startTransmission = useCallback(() => {
-    setState((prev) => ({ ...prev, transmitting: true }))
   }, [])
 
   // 传输动画播放完毕
@@ -62,5 +60,5 @@ export function useOsiState() {
   // 重置到初始状态
   const reset = useCallback(() => setState(INITIAL), [])
 
-  return { state, advanceSender, startTransmission, onTransmissionComplete, advanceReceiver, reset }
+  return { state, advanceSender, onTransmissionComplete, advanceReceiver, reset }
 }

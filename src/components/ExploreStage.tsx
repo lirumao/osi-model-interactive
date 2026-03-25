@@ -10,7 +10,6 @@ export function ExploreStage() {
   const {
     state,
     advanceSender,
-    startTransmission,
     onTransmissionComplete,
     advanceReceiver,
     reset,
@@ -25,38 +24,25 @@ export function ExploreStage() {
   }
 
   return (
-    <div className="flex h-full w-full">
-      {/* 发送端 38% */}
-      <div className="flex flex-col overflow-hidden" style={{ width: '38%', padding: '16px 12px 16px 16px' }}>
+    <div className="relative flex justify-center items-center h-full w-full px-[8%]">
+      {/* 传输动画 SVG 覆盖层 */}
+      <TransmissionAnim
+        playing={state.transmitting}
+        onComplete={onTransmissionComplete}
+      />
+
+      {/* 发送端 */}
+      <div className="flex flex-col overflow-hidden flex-1 max-w-[520px]" style={{ padding: '16px 12px 16px 0' }}>
         <SenderColumn activeIndex={state.senderActive} onNext={advanceSender} phase={state.phase} />
       </div>
 
-      {/* 传输区 24% */}
-      <div
-        className="flex flex-col"
-        style={{
-          width: '24%',
-          padding: '16px 8px',
-          borderLeft: '1px solid rgba(0,0,0,0.06)',
-          borderRight: '1px solid rgba(0,0,0,0.06)',
-        }}
-      >
-        <TransmissionAnim
-          playing={state.transmitting}
-          onComplete={onTransmissionComplete}
-          showButton={state.phase === 'transmitting' && !state.transmitting}
-          onSend={startTransmission}
-        />
-      </div>
+      {/* 间隔（传输动画穿越区域） */}
+      <div style={{ width: 80 }} />
 
-      {/* 接收端 38% */}
-      <div className="flex flex-col overflow-hidden" style={{ width: '38%', padding: '16px 16px 16px 12px' }}>
+      {/* 接收端 */}
+      <div className="flex flex-col overflow-hidden flex-1 max-w-[520px]" style={{ padding: '16px 0 16px 12px' }}>
         <ReceiverColumn
-          activeIndex={
-            state.phase === 'receiving'
-              ? state.receiverActive
-              : -1
-          }
+          activeIndex={state.phase === 'receiving' ? state.receiverActive : -1}
           onNext={advanceReceiver}
           phase={state.phase}
         />
