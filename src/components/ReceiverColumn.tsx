@@ -22,7 +22,7 @@ interface Props {
  * ...
  * receiverActive=6 (L7 active): 1 个（只剩 HTTP 请求）
  */
-function buildReceiverBlocks(receiverActive: number): EncapBlock[] {
+function buildReceiverBlocks(receiverActive: number, userText: string): EncapBlock[] {
   if (receiverActive < 0) return []
   // OSI_LAYERS: [L7(0), L6(1), ..., L1(6)]
   // 当前解封层在 OSI_LAYERS 的 index = 6 - receiverActive
@@ -31,8 +31,11 @@ function buildReceiverBlocks(receiverActive: number): EncapBlock[] {
   const blocks: EncapBlock[] = []
   for (let i = endIndex; i >= 0; i--) {
     const l = OSI_LAYERS[i]
+    const label = i === 0
+      ? (userText.length > 12 ? userText.slice(0, 12) + '…' : userText)
+      : l.encapsulation
     blocks.push({
-      label: l.encapsulation,
+      label,
       colorFrom: l.receiverColor.from,
       colorTo: l.receiverColor.to,
     })
@@ -85,7 +88,7 @@ export function ReceiverColumn({ activeIndex, onNext, phase, l1Ref, userText }: 
               status={status}
               colorFrom={layer.receiverColor.from}
               colorTo={layer.receiverColor.to}
-              blocks={i === activeDisplayIndex ? buildReceiverBlocks(activeIndex) : []}
+              blocks={i === activeDisplayIndex ? buildReceiverBlocks(activeIndex, userText) : []}
               detail={i === activeDisplayIndex ? currentLayer?.decapDetail : undefined}
               variant="receiver"
               bandRef={i === 6 ? l1Ref : undefined}

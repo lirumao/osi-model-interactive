@@ -24,7 +24,7 @@ export function DataCore({ variant, userText = 'GET /index.html HTTP/1.1', onUse
           type="text"
           value={userText}
           onChange={(e) => onUserTextChange(e.target.value)}
-          placeholder="GET /index.html HTTP/1.1"
+          placeholder="输入任意内容…"
           className="font-semibold text-xs w-full bg-transparent outline-none border-b border-gray-200 focus:border-blue-400 transition-colors py-0.5"
         />
       ) : (
