@@ -21,7 +21,7 @@ const INITIAL: OsiState = {
   senderActive: 0,
   receiverActive: -1,
   transmitting: false,
-  userText: 'GET /index.html HTTP/1.1',
+  userText: '',
 }
 
 export function useOsiState() {
@@ -32,11 +32,14 @@ export function useOsiState() {
   const advanceSender = useCallback(() => {
     setState((prev) => {
       if (prev.phase !== 'sending') return prev
-      const next = prev.senderActive + 1
-      if (next >= 7) {
+      if (prev.senderActive === 6) {
+        // L1 已激活，再点一次进入传输阶段
         return { ...prev, senderActive: 7, phase: 'transmitting', transmitting: true }
       }
-      return { ...prev, senderActive: next }
+      if (prev.senderActive < 6) {
+        return { ...prev, senderActive: prev.senderActive + 1 }
+      }
+      return prev
     })
   }, [])
 
