@@ -64,7 +64,11 @@ export function ReceiverColumn({ activeIndex, onNext, phase, l1Ref, userText }: 
         /* 等待占位：与 DataCore 等高，不隐藏，给用户视觉反馈 */
         <div className="rounded-xl px-4 py-3 mb-3 border border-dashed border-gray-200 bg-gray-50/60">
           <div className="text-[10px] text-gray-300 mb-1">等待接收</div>
-          <div className="font-semibold text-xs text-gray-300">— — —</div>
+          {userText.trim() ? (
+            <div className="font-semibold text-xs text-gray-300 opacity-50">{userText}</div>
+          ) : (
+            <div className="font-semibold text-xs text-gray-300">— — —</div>
+          )}
           <div className="text-[10px] text-gray-300 mt-0.5">传输完成后开始解封</div>
         </div>
       )}

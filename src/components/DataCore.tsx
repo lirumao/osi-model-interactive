@@ -6,7 +6,7 @@ interface DataCoreProps {
   onUserTextChange?: (text: string) => void
 }
 
-export function DataCore({ variant, userText = 'GET /index.html HTTP/1.1', onUserTextChange }: DataCoreProps) {
+export function DataCore({ variant, userText = '', onUserTextChange }: DataCoreProps) {
   const isSender = variant === 'sender'
   return (
     <div
