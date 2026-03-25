@@ -12,6 +12,7 @@ interface Props {
   onNext: () => void
   phase: Phase
   l1Ref?: React.RefObject<HTMLDivElement | null>
+  userText: string
 }
 
 /**
@@ -39,7 +40,7 @@ function buildReceiverBlocks(receiverActive: number): EncapBlock[] {
   return blocks
 }
 
-export function ReceiverColumn({ activeIndex, onNext, phase, l1Ref }: Props) {
+export function ReceiverColumn({ activeIndex, onNext, phase, l1Ref, userText }: Props) {
   const canAdvance = phase === 'receiving' && activeIndex >= 0 && activeIndex < 7
 
   // 显示顺序同发送端：OSI_LAYERS (L7=index0 在上, L1=index6 在下)
@@ -55,7 +56,7 @@ export function ReceiverColumn({ activeIndex, onNext, phase, l1Ref }: Props) {
         <span className="text-xs font-semibold text-gray-500 tracking-widest uppercase">接收端</span>
       </div>
       {activeIndex >= 7 ? (
-        <DataCore variant="receiver" />
+        <DataCore variant="receiver" userText={userText} />
       ) : (
         /* 等待占位：与 DataCore 等高，不隐藏，给用户视觉反馈 */
         <div className="rounded-xl px-4 py-3 mb-3 border border-dashed border-gray-200 bg-gray-50/60">

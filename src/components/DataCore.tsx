@@ -1,8 +1,12 @@
+'use client'
+
 interface DataCoreProps {
   variant: 'sender' | 'receiver'
+  userText?: string
+  onUserTextChange?: (text: string) => void
 }
 
-export function DataCore({ variant }: DataCoreProps) {
+export function DataCore({ variant, userText = 'GET /index.html HTTP/1.1', onUserTextChange }: DataCoreProps) {
   const isSender = variant === 'sender'
   return (
     <div
@@ -15,7 +19,17 @@ export function DataCore({ variant }: DataCoreProps) {
       <div className="text-[10px] text-gray-400 mb-1">
         {isSender ? '原始数据' : 'HTTP Request 已还原'}
       </div>
-      <div className="font-semibold text-xs">GET /index.html HTTP/1.1</div>
+      {isSender && onUserTextChange ? (
+        <input
+          type="text"
+          value={userText}
+          onChange={(e) => onUserTextChange(e.target.value)}
+          placeholder="GET /index.html HTTP/1.1"
+          className="font-semibold text-xs w-full bg-transparent outline-none border-b border-gray-200 focus:border-blue-400 transition-colors py-0.5"
+        />
+      ) : (
+        <div className="font-semibold text-xs">{userText}</div>
+      )}
       <div className="text-[10px] text-gray-400 mt-0.5">Host: example.com</div>
     </div>
   )

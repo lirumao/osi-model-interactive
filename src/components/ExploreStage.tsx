@@ -17,6 +17,7 @@ export function ExploreStage() {
     onTransmissionComplete,
     advanceReceiver,
     reset,
+    setUserText,
   } = useOsiState()
 
   if (state.phase === 'complete') {
@@ -39,7 +40,7 @@ export function ExploreStage() {
 
       {/* 发送端 */}
       <div className="flex flex-col overflow-hidden flex-1 max-w-[520px]" style={{ padding: '16px 12px 16px 0' }}>
-        <SenderColumn activeIndex={state.senderActive} onNext={advanceSender} phase={state.phase} l1Ref={senderL1Ref} />
+        <SenderColumn activeIndex={state.senderActive} onNext={advanceSender} phase={state.phase} l1Ref={senderL1Ref} userText={state.userText} onUserTextChange={setUserText} />
       </div>
 
       {/* 间隔（传输动画穿越区域） */}
@@ -52,6 +53,7 @@ export function ExploreStage() {
           onNext={advanceReceiver}
           phase={state.phase}
           l1Ref={receiverL1Ref}
+          userText={state.userText}
         />
       </div>
     </div>

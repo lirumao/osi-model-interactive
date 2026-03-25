@@ -12,6 +12,8 @@ export interface OsiState {
   receiverActive: number
   /** 传输动画是否正在播放 */
   transmitting: boolean
+  /** 用户在发送端输入的原始数据内容 */
+  userText: string
 }
 
 const INITIAL: OsiState = {
@@ -19,6 +21,7 @@ const INITIAL: OsiState = {
   senderActive: 0,
   receiverActive: -1,
   transmitting: false,
+  userText: 'GET /index.html HTTP/1.1',
 }
 
 export function useOsiState() {
@@ -57,8 +60,12 @@ export function useOsiState() {
     })
   }, [])
 
+  const setUserText = useCallback((text: string) => {
+    setState((prev) => ({ ...prev, userText: text }))
+  }, [])
+
   // 重置到初始状态
   const reset = useCallback(() => setState(INITIAL), [])
 
-  return { state, advanceSender, onTransmissionComplete, advanceReceiver, reset }
+  return { state, advanceSender, onTransmissionComplete, advanceReceiver, reset, setUserText }
 }
