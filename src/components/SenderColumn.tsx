@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import { OSI_LAYERS } from '@/data/osi-layers'
 import { LayerBand } from './LayerBand'
 import type { EncapBlock } from './LayerBand'
@@ -10,6 +11,7 @@ interface Props {
   activeIndex: number
   onNext: () => void
   phase: Phase
+  l1Ref?: React.RefObject<HTMLDivElement | null>
 }
 
 /**
@@ -30,7 +32,7 @@ function buildBlocks(upTo: number): EncapBlock[] {
   return blocks
 }
 
-export function SenderColumn({ activeIndex, onNext, phase }: Props) {
+export function SenderColumn({ activeIndex, onNext, phase, l1Ref }: Props) {
   const canAdvance = phase === 'sending' && activeIndex < 7
 
   return (
@@ -50,6 +52,7 @@ export function SenderColumn({ activeIndex, onNext, phase }: Props) {
             colorTo={layer.senderColor.to}
             blocks={i === activeIndex ? buildBlocks(i) : []}
             detail={i === activeIndex ? layer.encapDetail : undefined}
+            bandRef={i === 6 ? l1Ref : undefined}
           />
         ))}
       </div>

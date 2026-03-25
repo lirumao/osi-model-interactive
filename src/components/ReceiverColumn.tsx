@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import { OSI_LAYERS } from '@/data/osi-layers'
 import { LayerBand } from './LayerBand'
 import type { EncapBlock } from './LayerBand'
@@ -10,6 +11,7 @@ interface Props {
   activeIndex: number  // 0=L1 active, 1=L2 active, ..., 6=L7 active, 7=done
   onNext: () => void
   phase: Phase
+  l1Ref?: React.RefObject<HTMLDivElement | null>
 }
 
 /**
@@ -37,7 +39,7 @@ function buildReceiverBlocks(receiverActive: number): EncapBlock[] {
   return blocks
 }
 
-export function ReceiverColumn({ activeIndex, onNext, phase }: Props) {
+export function ReceiverColumn({ activeIndex, onNext, phase, l1Ref }: Props) {
   const canAdvance = phase === 'receiving' && activeIndex >= 0 && activeIndex < 7
 
   // 显示顺序同发送端：OSI_LAYERS (L7=index0 在上, L1=index6 在下)
@@ -85,6 +87,7 @@ export function ReceiverColumn({ activeIndex, onNext, phase }: Props) {
               blocks={i === activeDisplayIndex ? buildReceiverBlocks(activeIndex) : []}
               detail={i === activeDisplayIndex ? currentLayer?.decapDetail : undefined}
               variant="receiver"
+              bandRef={i === 6 ? l1Ref : undefined}
             />
           )
         })}

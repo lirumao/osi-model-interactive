@@ -1,14 +1,46 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import React from 'react'
 import gsap from 'gsap'
 
 interface Props {
   playing: boolean
   onComplete: () => void
+  senderL1Ref: React.RefObject<HTMLDivElement | null>
+  receiverL1Ref: React.RefObject<HTMLDivElement | null>
 }
 
-export function TransmissionAnim({ playing, onComplete }: Props) {
+// 二进制字符流：30个字符，固定序列，带 y 轴偏移
+const BITS = [
+  { ch: '1', yOff: -2,  delay: 0.00, dur: 1.10 },
+  { ch: '0', yOff:  1,  delay: 0.04, dur: 1.05 },
+  { ch: '1', yOff: -1,  delay: 0.08, dur: 1.08 },
+  { ch: '1', yOff:  2,  delay: 0.11, dur: 1.12 },
+  { ch: '0', yOff: -2,  delay: 0.15, dur: 1.00 },
+  { ch: '0', yOff:  1,  delay: 0.18, dur: 1.06 },
+  { ch: '1', yOff: -3,  delay: 0.22, dur: 1.03 },
+  { ch: '0', yOff:  2,  delay: 0.25, dur: 1.09 },
+  { ch: '1', yOff: -1,  delay: 0.28, dur: 1.07 },
+  { ch: '1', yOff:  3,  delay: 0.32, dur: 1.04 },
+  { ch: '0', yOff: -2,  delay: 0.35, dur: 1.11 },
+  { ch: '1', yOff:  1,  delay: 0.38, dur: 1.02 },
+  { ch: '0', yOff: -1,  delay: 0.41, dur: 1.08 },
+  { ch: '0', yOff:  2,  delay: 0.44, dur: 1.05 },
+  { ch: '1', yOff: -3,  delay: 0.47, dur: 1.10 },
+  { ch: '1', yOff:  1,  delay: 0.50, dur: 1.03 },
+  { ch: '0', yOff: -1,  delay: 0.53, dur: 1.06 },
+  { ch: '1', yOff:  2,  delay: 0.56, dur: 1.01 },
+  { ch: '0', yOff: -2,  delay: 0.59, dur: 1.09 },
+  { ch: '1', yOff:  1,  delay: 0.62, dur: 1.04 },
+  { ch: '0', yOff: -1,  delay: 0.65, dur: 1.07 },
+  { ch: '1', yOff:  2,  delay: 0.68, dur: 1.02 },
+  { ch: '0', yOff: -3,  delay: 0.71, dur: 1.05 },
+  { ch: '1', yOff:  1,  delay: 0.74, dur: 1.08 },
+  { ch: '0', yOff: -1,  delay: 0.77, dur: 1.03 },
+]
+
+export function TransmissionAnim({ playing, onComplete, senderL1Ref, receiverL1Ref }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const hasPlayed = useRef(false)
   const [size, setSize] = useState({ w: 0, h: 0 })
@@ -28,46 +60,60 @@ export function TransmissionAnim({ playing, onComplete }: Props) {
     hasPlayed.current = true
 
     const container = containerRef.current
-    if (!container) return
+    const parentEl = container?.parentElement
+    const senderEl = senderL1Ref.current
+    const receiverEl = receiverL1Ref.current
+    if (!container || !parentEl || !senderEl || !receiverEl) return
 
-    const path = container.querySelector('#motionPath') as SVGPathElement
-    const dot = container.querySelector('#packet') as SVGCircleElement
-    const trail = container.querySelector('#trail') as SVGPathElement
-    const trackLine = container.querySelector('#trackLine') as SVGPathElement
-    if (!path || !dot || !trail || !trackLine) return
+    const containerRect = parentEl.getBoundingClientRect()
+    const senderRect = senderEl.getBoundingClientRect()
+    const receiverRect = receiverEl.getBoundingClientRect()
+    const leftX = senderRect.right - containerRect.left
+    const rightX = receiverRect.left - containerRect.left
+    const y = (
+      senderRect.top + senderRect.height / 2 +
+      receiverRect.top + receiverRect.height / 2
+    ) / 2 - containerRect.top
 
-    const length = path.getTotalLength()
+    const fiberCore = container.querySelector('#fiberCore') as SVGLineElement
+    const fiberGlow = container.querySelector('#fiberGlow') as SVGLineElement
+    if (!fiberCore || !fiberGlow) return
+
+    fiberCore.setAttribute('x1', String(leftX))
+    fiberCore.setAttribute('y1', String(y))
+    fiberCore.setAttribute('x2', String(rightX))
+    fiberCore.setAttribute('y2', String(y))
+    fiberGlow.setAttribute('x1', String(leftX))
+    fiberGlow.setAttribute('y1', String(y))
+    fiberGlow.setAttribute('x2', String(rightX))
+    fiberGlow.setAttribute('y2', String(y))
 
     const tl = gsap.timeline({ onComplete })
+    const lastEnd = Math.max(...BITS.map(b => b.delay + b.dur))
 
-    // 轨迹线渐显
-    gsap.set(trackLine, { strokeDasharray: length, strokeDashoffset: length })
-    tl.to(trackLine, { strokeDashoffset: 0, duration: 0.4, ease: 'power1.out' }, 0)
+    // 光纤线：渐显
+    tl.fromTo([fiberCore, fiberGlow],
+      { opacity: 0 },
+      { opacity: 1, duration: 0.3, ease: 'power2.out' },
+      0
+    )
 
-    // 发光点沿路径移动
-    tl.set(dot, { opacity: 1 }, 0.2)
-    tl.to({ t: 0 }, {
-      t: 1,
-      duration: 1.2,
-      ease: 'power1.inOut',
-      onUpdate() {
-        const progress = (this.targets()[0] as { t: number }).t
-        const point = path.getPointAtLength(progress * length)
-        gsap.set(dot, { attr: { cx: point.x, cy: point.y } })
+    // 二进制字符流
+    BITS.forEach(({ yOff, delay, dur }, i) => {
+      const el = container.querySelector(`#bit${i}`) as SVGTextElement
+      if (!el) return
 
-        const trailLen = length * 0.2
-        const startDist = Math.max(0, progress * length - trailLen)
-        gsap.set(trail, {
-          strokeDasharray: `${trailLen} ${length}`,
-          strokeDashoffset: -startDist,
-        })
-      },
-    }, 0.2)
+      gsap.set(el, { attr: { x: leftX, y: y + yOff }, opacity: 0 })
+      tl.to(el, { opacity: 1, duration: 0.08 }, 0.1 + delay)
+      tl.to(el, { attr: { x: rightX }, duration: dur, ease: 'none' }, 0.1 + delay)
+      tl.to(el, { opacity: 0, duration: 0.1 }, 0.1 + delay + dur - 0.08)
+    })
 
-    tl.to([dot, trail, trackLine], { opacity: 0, duration: 0.3 }, '+=0.1')
+    // 光纤线：渐出
+    tl.to([fiberCore, fiberGlow], { opacity: 0, duration: 0.4 }, lastEnd + 0.15)
 
     return () => { tl.kill() }
-  }, [playing, onComplete, size])
+  }, [playing, onComplete, size, senderL1Ref, receiverL1Ref])
 
   useEffect(() => {
     if (!playing) hasPlayed.current = false
@@ -78,67 +124,65 @@ export function TransmissionAnim({ playing, onComplete }: Props) {
   }
 
   const { w, h } = size
-  // 底部水平连接：发送端 L1 右边 → 接收端 L1 左边
-  const leftX = w * 0.48
-  const rightX = w * 0.52
-  const y = h - 46  // L1 行高度
-
-  const d = `M ${leftX} ${y} L ${rightX} ${y}`
 
   return (
     <div ref={containerRef} className="absolute inset-0 pointer-events-none z-20">
-      <svg
-        width={w}
-        height={h}
-        viewBox={`0 0 ${w} ${h}`}
-        className="absolute inset-0"
-        style={{ overflow: 'visible' }}
-      >
+      <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="absolute inset-0" style={{ overflow: 'visible' }}>
         <defs>
-          <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#818cf8" />
-            <stop offset="100%" stopColor="#34d399" />
-          </linearGradient>
-          <filter id="dotGlow">
-            <feGaussianBlur stdDeviation="4" result="b" />
+          {/* 光纤外层光晕 */}
+          <filter id="fiberGlowFilter" x="-20%" y="-500%" width="140%" height="1100%">
+            <feGaussianBlur stdDeviation="6" result="b1" />
+            <feGaussianBlur stdDeviation="12" result="b2" />
             <feMerge>
-              <feMergeNode in="b" />
+              <feMergeNode in="b2" />
+              <feMergeNode in="b1" />
+            </feMerge>
+          </filter>
+          {/* 二进制字符光晕 */}
+          <filter id="bitGlow" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur stdDeviation="2.5" result="b" />
+            <feMerge>
               <feMergeNode in="b" />
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
         </defs>
 
-        <path
-          id="trackLine"
-          d={d}
-          fill="none"
-          stroke="url(#lineGrad)"
-          strokeWidth="2"
-          strokeDasharray="5 4"
-          opacity="0.3"
-        />
-
-        <path id="motionPath" d={d} fill="none" stroke="none" />
-
-        <path
-          id="trail"
-          d={d}
-          fill="none"
-          stroke="url(#lineGrad)"
-          strokeWidth="3"
-          strokeLinecap="round"
-          opacity="0.5"
-          strokeDasharray={`0 ${9999}`}
-        />
-
-        <circle
-          id="packet"
-          r="5"
-          fill="#818cf8"
+        {/* 光纤芯（白色细线） */}
+        <line
+          id="fiberCore"
+          x1="0" y1="0" x2="0" y2="0"
+          stroke="rgba(255,255,255,0.9)"
+          strokeWidth="1.5"
           opacity="0"
-          filter="url(#dotGlow)"
         />
+        {/* 光纤辉光 */}
+        <line
+          id="fiberGlow"
+          x1="0" y1="0" x2="0" y2="0"
+          stroke="#67e8f9"
+          strokeWidth="4"
+          opacity="0"
+          filter="url(#fiberGlowFilter)"
+        />
+
+        {/* 二进制字符 */}
+        {BITS.map(({ ch }, i) => (
+          <text
+            key={i}
+            id={`bit${i}`}
+            fontSize="8"
+            fontFamily="monospace"
+            fontWeight="bold"
+            fill="#67e8f9"
+            textAnchor="middle"
+            dominantBaseline="middle"
+            opacity="0"
+            filter="url(#bitGlow)"
+          >
+            {ch}
+          </text>
+        ))}
       </svg>
     </div>
   )

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import type { OsiLayer } from '@/data/osi-layers'
 
@@ -24,12 +24,20 @@ interface LayerBandProps {
   /** sender=新方块弹入, receiver=旧方块消失 */
   variant?: 'sender' | 'receiver'
   replayKey?: number
+  bandRef?: React.Ref<HTMLDivElement>
 }
 
-export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], detail, variant = 'sender', replayKey = 0 }: LayerBandProps) {
-  const bandRef = useRef<HTMLDivElement>(null)
+export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], detail, variant = 'sender', replayKey = 0, bandRef }: LayerBandProps) {
+  const innerBandRef = useRef<HTMLDivElement>(null)
   const collapsedRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
+
+  const mergedBandRef = (el: HTMLDivElement | null) => {
+    innerBandRef.current = el
+    if (!bandRef) return
+    if (typeof bandRef === 'function') bandRef(el)
+    else (bandRef as { current: HTMLDivElement | null }).current = el
+  }
 
   const hasBlocks = status === 'active' && blocks.length > 0
   const hasDetail = hasBlocks && !!detail
@@ -37,7 +45,7 @@ export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], deta
   const expandedHeight = 76 + (hasBlocks ? 44 : 0) + (hasDetail ? 20 : 0)
 
   useEffect(() => {
-    const band = bandRef.current
+    const band = innerBandRef.current
     const collapsed = collapsedRef.current
     const content = contentRef.current
     if (!band || !collapsed || !content) return
@@ -98,7 +106,7 @@ export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], deta
 
   return (
     <div
-      ref={bandRef}
+      ref={mergedBandRef}
       className="w-full rounded-lg overflow-hidden mb-1 select-none"
       style={{
         background: `linear-gradient(135deg, ${colorFrom}, ${colorTo})`,
