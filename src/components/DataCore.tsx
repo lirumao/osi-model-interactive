@@ -17,7 +17,7 @@ export function DataCore({ variant, userText = 'GET /index.html HTTP/1.1', onUse
       }`}
     >
       <div className="text-[10px] text-gray-400 mb-1">
-        {isSender ? '原始数据' : 'HTTP Request 已还原'}
+        {isSender ? '原始数据' : '已还原'}
       </div>
       {isSender && onUserTextChange ? (
         <input
@@ -30,7 +30,6 @@ export function DataCore({ variant, userText = 'GET /index.html HTTP/1.1', onUse
       ) : (
         <div className="font-semibold text-xs">{userText}</div>
       )}
-      <div className="text-[10px] text-gray-400 mt-0.5">Host: example.com</div>
     </div>
   )
 }
