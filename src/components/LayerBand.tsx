@@ -134,11 +134,8 @@ export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], deta
 
       {/* 展开态 */}
       <div ref={contentRef} className="px-3 pb-2 text-center" style={{ opacity: 0 }}>
-        <div className="text-[10px] text-gray-500 font-medium">
+        <div className="text-[20px] font-bold text-gray-800 leading-tight mt-0.5">
           L{layer.level} · {layer.name}
-        </div>
-        <div className="text-[17px] font-bold text-gray-800 leading-tight mt-0.5">
-          {layer.name}
         </div>
         <div className="text-[10px] text-gray-500 mt-0.5 leading-relaxed">
           {detail ?? layer.description}
