@@ -154,14 +154,14 @@ export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], deta
         {/* 封装方块行：水平排列，左=最新头部，右=原始数据 */}
         {hasBlocks && (
           <div className="encap-row mt-2 flex flex-col items-center">
-            <div className="flex items-center justify-center gap-[2px] flex-wrap">
+            <div className="flex items-center justify-center gap-1 flex-wrap">
               {blocks.map((b, idx) => (
                 <div
                   key={idx}
-                  className="encap-block flex-shrink-0 flex items-center justify-center rounded text-[8px] font-semibold text-gray-700 whitespace-nowrap"
+                  className="encap-block flex-shrink-0 flex items-center justify-center rounded text-[10px] font-semibold text-gray-700 whitespace-nowrap"
                   style={{
-                    height: 22,
-                    padding: '0 6px',
+                    height: 28,
+                    padding: '0 10px',
                     background: `linear-gradient(135deg, ${b.colorFrom}, ${b.colorTo})`,
                     border: '1px solid rgba(255,255,255,0.6)',
                   }}

@@ -25,7 +25,7 @@ export const OSI_LAYERS: OsiLayer[] = [
     encapDetail: '将用户操作转为 HTTP 报文 (GET /index.html)',
     decapDetail: '解析 HTTP 报文，将数据内容呈现给应用程序',
     senderColor: { from: '#e0e7ff', to: '#c7d2fe' },
-    receiverColor: { from: '#c7d2fe', to: '#a5b4fc' },
+    receiverColor: { from: '#818cf8', to: '#6366f1' },
   },
   {
     level: 6, name: '表示层',
@@ -35,7 +35,7 @@ export const OSI_LAYERS: OsiLayer[] = [
     encapDetail: '对数据进行 TLS 加密，确保传输安全',
     decapDetail: 'TLS 解密，将密文数据还原为明文',
     senderColor: { from: '#c7d2fe', to: '#a5b4fc' },
-    receiverColor: { from: '#ddd6fe', to: '#c4b5fd' },
+    receiverColor: { from: '#a78bfa', to: '#8b5cf6' },
   },
   {
     level: 5, name: '会话层',
@@ -45,7 +45,7 @@ export const OSI_LAYERS: OsiLayer[] = [
     encapDetail: '添加会话标识，管理连接的建立与保持',
     decapDetail: '验证会话 ID，确认连接状态，移除会话控制信息',
     senderColor: { from: '#c4b5fd', to: '#a78bfa' },
-    receiverColor: { from: '#e9d5ff', to: '#d8b4fe' },
+    receiverColor: { from: '#c084fc', to: '#a855f7' },
   },
   {
     level: 4, name: '传输层',
@@ -55,7 +55,7 @@ export const OSI_LAYERS: OsiLayer[] = [
     encapDetail: '添加源/目标端口号，实现可靠的端到端传输',
     decapDetail: '校验 TCP 序列号，重组数据段，去掉端口头部',
     senderColor: { from: '#93c5fd', to: '#60a5fa' },
-    receiverColor: { from: '#bfdbfe', to: '#93c5fd' },
+    receiverColor: { from: '#60a5fa', to: '#3b82f6' },
   },
   {
     level: 3, name: '网络层',
@@ -65,7 +65,7 @@ export const OSI_LAYERS: OsiLayer[] = [
     encapDetail: '添加源/目标 IP 地址，选择路由路径',
     decapDetail: '读取目标 IP 地址，去掉 IP 头，向传输层递交',
     senderColor: { from: '#7dd3fc', to: '#38bdf8' },
-    receiverColor: { from: '#a5f3fc', to: '#67e8f9' },
+    receiverColor: { from: '#22d3ee', to: '#06b6d4' },
   },
   {
     level: 2, name: '数据链路层',
@@ -75,7 +75,7 @@ export const OSI_LAYERS: OsiLayer[] = [
     encapDetail: '封装成以太网帧，添加 MAC 地址和校验码',
     decapDetail: '校验 CRC 完整性，去掉帧头尾，提取 IP 数据包',
     senderColor: { from: '#67e8f9', to: '#22d3ee' },
-    receiverColor: { from: '#99f6e4', to: '#5eead4' },
+    receiverColor: { from: '#2dd4bf', to: '#14b8a6' },
   },
   {
     level: 1, name: '物理层',
@@ -85,7 +85,7 @@ export const OSI_LAYERS: OsiLayer[] = [
     encapDetail: '将帧转为电信号/光信号/电磁波进行物理传输',
     decapDetail: '接收物理信号，将电/光/无线信号还原为比特流',
     senderColor: { from: '#5eead4', to: '#2dd4bf' },
-    receiverColor: { from: '#6ee7b7', to: '#34d399' },
+    receiverColor: { from: '#34d399', to: '#10b981' },
   },
 ]
 
