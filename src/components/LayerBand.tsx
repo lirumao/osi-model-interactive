@@ -139,7 +139,7 @@ export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], deta
         <div className="text-[20px] font-bold text-gray-800 leading-tight mt-0.5">
           L{layer.level} · {layer.name}
         </div>
-        <div className="text-[10px] text-gray-500 mt-0.5 leading-relaxed">
+        <div style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }} className="text-[13px] font-medium text-gray-600 mt-0.5 leading-[1.5] tracking-[0.01em] opacity-90 text-center block w-full">
           {variant === 'receiver' && receiverDescription ? receiverDescription : layer.description}
         </div>
         <div className="flex flex-wrap gap-1 mt-1.5 justify-center">

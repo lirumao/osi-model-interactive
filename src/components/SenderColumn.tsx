@@ -31,7 +31,7 @@ function buildBlocks(upTo: number, userText: string): EncapBlock[] {
           ? (userText.length > 12 ? userText.slice(0, 12) + '…' : userText)
           : l.encapsulation)
       : l.encapsulation
-    blocks.push({
+    if (label) blocks.push({
       label,
       colorFrom: l.senderColor.from,
       colorTo: l.senderColor.to,

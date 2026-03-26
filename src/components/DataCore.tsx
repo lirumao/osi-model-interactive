@@ -10,7 +10,8 @@ export function DataCore({ variant, userText = '', onUserTextChange }: DataCoreP
   const isSender = variant === 'sender'
   return (
     <div
-      className={`rounded-xl px-4 py-3 mb-3 text-sm font-mono backdrop-blur-sm border ${
+      style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', fontSize: '15px', lineHeight: 1.6 }}
+      className={`rounded-xl px-4 py-3 mb-3 backdrop-blur-sm border ${
         isSender
           ? 'bg-white/80 border-gray-200 text-gray-700'
           : 'bg-emerald-50/80 border-emerald-300 text-emerald-800'
@@ -25,7 +26,8 @@ export function DataCore({ variant, userText = '', onUserTextChange }: DataCoreP
           value={userText}
           onChange={(e) => onUserTextChange(e.target.value)}
           placeholder="输入任意内容…"
-          className="font-semibold text-xs w-full bg-transparent outline-none border-b border-gray-200 focus:border-blue-400 transition-colors py-0.5"
+          style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', fontSize: '14px', letterSpacing: '-0.01em' }}
+          className="font-semibold w-full bg-transparent outline-none border-b border-gray-200 focus:border-blue-400 transition-colors py-0.5"
         />
       ) : (
         <div className="font-semibold text-xs">{userText}</div>

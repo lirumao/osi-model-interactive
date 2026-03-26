@@ -38,7 +38,7 @@ function buildReceiverBlocks(receiverActive: number, userText: string): EncapBlo
           ? (userText.length > 12 ? userText.slice(0, 12) + '…' : userText)
           : l.encapsulation)
       : l.encapsulation
-    blocks.push({
+    if (label) blocks.push({
       label,
       colorFrom: l.receiverColor.from,
       colorTo: l.receiverColor.to,
