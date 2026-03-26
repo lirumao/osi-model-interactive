@@ -170,7 +170,7 @@ export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], deta
                 </div>
               ))}
             </div>
-            {hasDetail && (
+            {hasDetail && detail !== layer.description && (
               <div className="encap-detail text-[9px] text-gray-600 mt-1 text-center italic line-clamp-1 max-w-full px-1">
                 {detail}
               </div>
