@@ -1,6 +1,7 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
+import gsap from 'gsap'
 import { useOsiState } from '@/hooks/useOsiState'
 import { OSI_LAYERS } from '@/data/osi-layers'
 
@@ -14,6 +15,32 @@ function LayerIndicator({ phase, senderActive, receiverActive }: {
   senderActive: number
   receiverActive: number
 }) {
+  const senderDotRefs = useRef<(HTMLDivElement | null)[]>([])
+  const receiverDotRefs = useRef<(HTMLDivElement | null)[]>([])
+
+  useEffect(() => {
+    senderDotRefs.current.forEach((el, i) => {
+      if (!el) return
+      gsap.killTweensOf(el)
+      gsap.set(el, { scale: 1, opacity: 1 })
+      if (i === senderActive) {
+        gsap.to(el, { scale: 1.6, opacity: 0.6, duration: 0.7, repeat: -1, yoyo: true, ease: 'sine.inOut' })
+      }
+    })
+  }, [senderActive])
+
+  useEffect(() => {
+    const recvCurrentIdx = phase === 'receiving' ? 6 - receiverActive : -1
+    receiverDotRefs.current.forEach((el, i) => {
+      if (!el) return
+      gsap.killTweensOf(el)
+      gsap.set(el, { scale: 1, opacity: 1 })
+      if (i === recvCurrentIdx) {
+        gsap.to(el, { scale: 1.6, opacity: 0.6, duration: 0.7, repeat: -1, yoyo: true, ease: 'sine.inOut' })
+      }
+    })
+  }, [receiverActive, phase])
+
   if (phase === 'transmitting' || phase === 'complete') return null
 
   return (
@@ -36,21 +63,27 @@ function LayerIndicator({ phase, senderActive, receiverActive }: {
         return (
           <div key={layer.level} className="flex items-center w-full gap-1" style={{ marginBottom: 4 }}>
             {/* 左点（发送） */}
-            <div className={[
-              'w-2 h-2 rounded-full flex-shrink-0 transition-all duration-300',
-              senderActive_ ? 'bg-indigo-500 scale-110' :
-              senderDone ? 'bg-indigo-300' : 'bg-gray-200'
-            ].join(' ')} />
+            <div
+              ref={el => { senderDotRefs.current[i] = el }}
+              className={[
+                'w-3 h-3 rounded-full flex-shrink-0',
+                senderActive_ ? 'bg-indigo-500' :
+                senderDone ? 'bg-indigo-300' : 'bg-gray-200'
+              ].join(' ')}
+            />
             {/* 中间层标签 */}
             <div className="flex-1 text-center">
               <span className="text-[7px] text-gray-400">L{layer.level}</span>
             </div>
             {/* 右点（接收） */}
-            <div className={[
-              'w-2 h-2 rounded-full flex-shrink-0 transition-all duration-300',
-              recvActive_ ? 'bg-emerald-500 scale-110' :
-              recvDone ? 'bg-emerald-300' : 'bg-gray-200'
-            ].join(' ')} />
+            <div
+              ref={el => { receiverDotRefs.current[i] = el }}
+              className={[
+                'w-3 h-3 rounded-full flex-shrink-0',
+                recvActive_ ? 'bg-emerald-500' :
+                recvDone ? 'bg-emerald-300' : 'bg-gray-200'
+              ].join(' ')}
+            />
           </div>
         )
       })}
@@ -96,7 +129,6 @@ export function ExploreStage() {
 
       {/* 间隔（传输动画穿越区域） */}
       <div style={{ width: 120 }} className="relative flex-shrink-0 self-stretch flex flex-col items-center justify-center">
-        <div className="absolute inset-y-0 left-1/2 w-px bg-gray-200 -translate-x-1/2" />
         <LayerIndicator phase={state.phase} senderActive={state.senderActive} receiverActive={state.receiverActive} />
       </div>
 
