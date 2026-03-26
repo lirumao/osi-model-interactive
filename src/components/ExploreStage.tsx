@@ -15,32 +15,45 @@ function LayerIndicator({ phase, senderActive, receiverActive }: {
   receiverActive: number
 }) {
   if (phase === 'transmitting' || phase === 'complete') return null
-  const isSending = phase === 'sending'
-  // OSI_LAYERS index 0=L7, 6=L1
+
   return (
-    <div className="relative z-10 flex flex-col items-center select-none">
-      <span className="text-[8px] text-gray-400 mb-2">{isSending ? '封装↓' : '解封↑'}</span>
-      <div className="relative flex flex-col items-center gap-0">
-        <div className="absolute inset-x-1/2 top-1 bottom-1 w-px bg-gray-200 -translate-x-1/2" />
-        {OSI_LAYERS.map((layer, i) => {
-          const currentIdx = isSending ? senderActive : (6 - receiverActive)
-          const isDone = isSending ? i < currentIdx : i > currentIdx
-          const isActive = i === currentIdx
-          return (
-            <div key={layer.level} className="relative z-10 flex flex-col items-center" style={{ marginBottom: 6 }}>
-              <div className={[
-                'w-2.5 h-2.5 rounded-full border-2 transition-all duration-300',
-                isActive ? 'bg-indigo-500 border-indigo-500 scale-110' :
-                isDone ? 'bg-indigo-300 border-indigo-300' :
-                'bg-white border-gray-300'
-              ].join(' ')} />
-              {isActive && (
-                <span className="text-[7px] text-indigo-500 mt-0.5 leading-none">L{layer.level}</span>
-              )}
-            </div>
-          )
-        })}
+    <div className="relative z-10 flex flex-col items-center gap-0 select-none w-full px-2">
+      {/* 标签 */}
+      <div className="flex w-full justify-between mb-1 px-1">
+        <span className="text-[7px] text-gray-400">封装↓</span>
+        <span className="text-[7px] text-gray-400">↑解封</span>
       </div>
+
+      {/* 7层双点轨道 */}
+      {OSI_LAYERS.map((layer, i) => {
+        const senderDone = i < senderActive
+        const senderActive_ = i === senderActive
+
+        const recvCurrentIdx = phase === 'receiving' ? 6 - receiverActive : -1
+        const recvDone = phase === 'receiving' && i > recvCurrentIdx
+        const recvActive_ = i === recvCurrentIdx
+
+        return (
+          <div key={layer.level} className="flex items-center w-full gap-1" style={{ marginBottom: 4 }}>
+            {/* 左点（发送） */}
+            <div className={[
+              'w-2 h-2 rounded-full flex-shrink-0 transition-all duration-300',
+              senderActive_ ? 'bg-indigo-500 scale-110' :
+              senderDone ? 'bg-indigo-300' : 'bg-gray-200'
+            ].join(' ')} />
+            {/* 中间层标签 */}
+            <div className="flex-1 text-center">
+              <span className="text-[7px] text-gray-400">L{layer.level}</span>
+            </div>
+            {/* 右点（接收） */}
+            <div className={[
+              'w-2 h-2 rounded-full flex-shrink-0 transition-all duration-300',
+              recvActive_ ? 'bg-emerald-500 scale-110' :
+              recvDone ? 'bg-emerald-300' : 'bg-gray-200'
+            ].join(' ')} />
+          </div>
+        )
+      })}
     </div>
   )
 }

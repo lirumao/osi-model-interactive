@@ -102,6 +102,7 @@ export function ReceiverColumn({ activeIndex, onNext, phase, l1Ref, userText, hi
               colorTo={layer.receiverColor.to}
               blocks={i === activeDisplayIndex ? buildReceiverBlocks(activeIndex, userText) : []}
               detail={i === activeDisplayIndex ? currentLayer?.decapDetail : undefined}
+              receiverDescription={layer.receiverDescription}
               variant="receiver"
               bandRef={i === 6 ? l1Ref : undefined}
               highlight={highlightReceiverLayer === i}

@@ -21,6 +21,8 @@ interface LayerBandProps {
   blocks?: EncapBlock[]
   /** 当前层封装的说明文字 */
   detail?: string
+  /** 接收端视角的层描述（展开态替换 layer.description） */
+  receiverDescription?: string
   /** sender=新方块弹入, receiver=旧方块消失 */
   variant?: 'sender' | 'receiver'
   replayKey?: number
@@ -29,7 +31,7 @@ interface LayerBandProps {
   highlight?: boolean
 }
 
-export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], detail, variant = 'sender', replayKey = 0, bandRef, highlight = false }: LayerBandProps) {
+export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], detail, receiverDescription, variant = 'sender', replayKey = 0, bandRef, highlight = false }: LayerBandProps) {
   const innerBandRef = useRef<HTMLDivElement>(null)
   const collapsedRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
@@ -138,7 +140,7 @@ export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], deta
           L{layer.level} · {layer.name}
         </div>
         <div className="text-[10px] text-gray-500 mt-0.5 leading-relaxed">
-          {layer.description}
+          {variant === 'receiver' && receiverDescription ? receiverDescription : layer.description}
         </div>
         <div className="flex flex-wrap gap-1 mt-1.5 justify-center">
           {layer.protocols.map((p) => (
