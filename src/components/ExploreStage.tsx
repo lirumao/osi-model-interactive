@@ -17,6 +17,8 @@ function LayerIndicator({ phase, senderActive, receiverActive }: {
 }) {
   const senderDotRefs = useRef<(HTMLDivElement | null)[]>([])
   const receiverDotRefs = useRef<(HTMLDivElement | null)[]>([])
+  const senderArrowRef = useRef<SVGSVGElement>(null)
+  const receiverArrowRef = useRef<SVGSVGElement>(null)
 
   useEffect(() => {
     senderDotRefs.current.forEach((el, i) => {
@@ -41,14 +43,32 @@ function LayerIndicator({ phase, senderActive, receiverActive }: {
     })
   }, [receiverActive, phase])
 
+  useEffect(() => {
+    if (!senderArrowRef.current) return
+    const tl = gsap.timeline({ repeat: -1 })
+    tl.to(senderArrowRef.current, { y: 6, duration: 0.5, ease: 'power1.inOut' })
+    tl.to(senderArrowRef.current, { y: 0, duration: 0.5, ease: 'power1.inOut' })
+    return () => { tl.kill() }
+  }, [])
+
+  useEffect(() => {
+    if (!receiverArrowRef.current) return
+    const tl = gsap.timeline({ repeat: -1 })
+    tl.to(receiverArrowRef.current, { y: -6, duration: 0.5, ease: 'power1.inOut' })
+    tl.to(receiverArrowRef.current, { y: 0, duration: 0.5, ease: 'power1.inOut' })
+    return () => { tl.kill() }
+  }, [])
+
   if (phase === 'transmitting' || phase === 'complete') return null
 
   return (
     <div className="relative z-10 flex flex-col items-center gap-0 select-none w-full px-2">
-      {/* 标签 */}
-      <div className="flex w-full justify-between mb-1 px-1">
-        <span className="text-[7px] text-gray-400">封装↓</span>
-        <span className="text-[7px] text-gray-400">↑解封</span>
+      {/* 顶部箭头行：发送端朝下箭头 */}
+      <div className="flex w-full justify-between mb-1 px-1 items-center" style={{ minHeight: 16 }}>
+        <svg ref={senderArrowRef} width="16" height="12" viewBox="0 0 16 12" className="text-indigo-400" fill="currentColor">
+          <path d="M8 0L15 8H9V12H7V8H1L8 0Z" transform="rotate(180 8 6)" />
+        </svg>
+        <div />
       </div>
 
       {/* 7层双点轨道 */}
@@ -87,6 +107,14 @@ function LayerIndicator({ phase, senderActive, receiverActive }: {
           </div>
         )
       })}
+
+      {/* 底部箭头行：接收端朝上箭头 */}
+      <div className="flex w-full justify-between mt-1 px-1 items-center" style={{ minHeight: 16 }}>
+        <div />
+        <svg ref={receiverArrowRef} width="16" height="12" viewBox="0 0 16 12" className="text-emerald-400" fill="currentColor">
+          <path d="M8 0L15 8H9V12H7V8H1L8 0Z" />
+        </svg>
+      </div>
     </div>
   )
 }
