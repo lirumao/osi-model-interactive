@@ -29,7 +29,7 @@ export function ExploreStage() {
   }
 
   return (
-    <div className="relative flex justify-center items-center h-full w-full px-[8%]">
+    <div className="relative flex justify-center items-center h-full w-full px-[3%]">
       {/* 传输动画 SVG 覆盖层 */}
       <TransmissionAnim
         playing={state.transmitting}
@@ -39,15 +39,15 @@ export function ExploreStage() {
       />
 
       {/* 发送端 */}
-      <div className="flex flex-col overflow-hidden flex-1 max-w-[520px]" style={{ padding: '16px 12px 16px 0' }}>
+      <div className="flex flex-col overflow-hidden flex-1 max-w-[600px]" style={{ padding: '16px 12px 16px 0' }}>
         <SenderColumn activeIndex={state.senderActive} onNext={advanceSender} phase={state.phase} l1Ref={senderL1Ref} userText={state.userText} onUserTextChange={setUserText} />
       </div>
 
       {/* 间隔（传输动画穿越区域） */}
-      <div style={{ width: 160 }} />
+      <div style={{ width: 120 }} />
 
       {/* 接收端 */}
-      <div className="flex flex-col overflow-hidden flex-1 max-w-[520px]" style={{ padding: '16px 0 16px 12px' }}>
+      <div className="flex flex-col overflow-hidden flex-1 max-w-[600px]" style={{ padding: '16px 0 16px 12px' }}>
         <ReceiverColumn
           activeIndex={state.phase === 'receiving' ? state.receiverActive : -1}
           onNext={advanceReceiver}

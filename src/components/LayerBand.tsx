@@ -43,8 +43,8 @@ export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], deta
 
   const hasBlocks = status === 'active' && blocks.length > 0
   const hasDetail = hasBlocks && !!detail
-  // 基础展开 76px + 方块行 44px + detail 文字行 20px
-  const expandedHeight = 76 + (hasBlocks ? 44 : 0) + (hasDetail ? 20 : 0)
+  // 基础展开 88px + 方块行 44px + detail 文字行 20px
+  const expandedHeight = 88 + (hasBlocks ? 44 : 0) + (hasDetail ? 20 : 0)
 
   useEffect(() => {
     const band = innerBandRef.current
@@ -97,7 +97,7 @@ export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], deta
     } else {
       tl = gsap.timeline()
         .to(Array.from(content.children), { opacity: 0, duration: 0.15 }, 0)
-        .to(band, { height: 20, duration: 0.25, ease: 'power2.in' }, 0)
+        .to(band, { height: 28, duration: 0.25, ease: 'power2.in' }, 0)
         .to(collapsed, { opacity: 1, duration: 0.2 }, 0.1)
     }
 
@@ -123,13 +123,13 @@ export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], deta
         background: `linear-gradient(135deg, ${colorFrom}, ${colorTo})`,
         opacity: bandOpacity,
         transition: 'opacity 0.3s',
-        height: 20,
+        height: 28,
       }}
     >
       {/* 折叠态 */}
-      <div ref={collapsedRef} className="flex items-center justify-center gap-1.5 px-3" style={{ height: 20 }}>
-        <span className="text-[10px] font-semibold text-gray-700">L{layer.level}</span>
-        <span className="text-[10px] text-gray-600">{layer.name}</span>
+      <div ref={collapsedRef} className="flex items-center justify-center gap-1.5 px-3" style={{ height: 28 }}>
+        <span className="text-[11px] font-semibold text-gray-700">L{layer.level}</span>
+        <span className="text-[11px] text-gray-600">{layer.name}</span>
       </div>
 
       {/* 展开态 */}
