@@ -1,6 +1,7 @@
 'use client'
 
-import React from 'react'
+import React, { useRef } from 'react'
+import gsap from 'gsap'
 import { OSI_LAYERS } from '@/data/osi-layers'
 import { LayerBand } from './LayerBand'
 import type { EncapBlock } from './LayerBand'
@@ -48,12 +49,29 @@ function buildReceiverBlocks(receiverActive: number, userText: string): EncapBlo
 
 export function ReceiverColumn({ activeIndex, onNext, phase, l1Ref, userText, highlightReceiverLayer }: Props) {
   const canAdvance = phase === 'receiving' && activeIndex >= 0 && activeIndex < 7
+  const activeLayerRef = useRef<HTMLDivElement>(null)
 
   // 显示顺序同发送端：OSI_LAYERS (L7=index0 在上, L1=index6 在下)
   // receiverActive=0 → L1 active → 显示 index 6 active
   // receiverActive=1 → L2 active → 显示 index 5 active
   const activeDisplayIndex = activeIndex >= 0 && activeIndex < 7 ? 6 - activeIndex : -1
   const currentLayer = activeDisplayIndex >= 0 ? OSI_LAYERS[activeDisplayIndex] : undefined
+
+  const handleNext = () => {
+    const band = activeLayerRef.current
+    if (!band) { onNext(); return }
+    const firstBlock = band.querySelector('.encap-block')
+    if (!firstBlock) { onNext(); return }
+
+    gsap.to(firstBlock, {
+      scaleX: 0,
+      opacity: 0,
+      transformOrigin: 'left center',
+      duration: 0.35,
+      ease: 'power2.in',
+      onComplete: onNext,
+    })
+  }
 
   return (
     <div className="flex flex-col h-full">
@@ -93,6 +111,15 @@ export function ReceiverColumn({ activeIndex, onNext, phase, l1Ref, userText, hi
             status = 'inactive' // 上方的层还没到
           }
 
+          const mergedRef = (i === 6 && i === activeDisplayIndex)
+            ? (el: HTMLDivElement | null) => {
+                (activeLayerRef as { current: HTMLDivElement | null }).current = el
+                if (l1Ref) (l1Ref as { current: HTMLDivElement | null }).current = el
+              }
+            : i === activeDisplayIndex ? activeLayerRef
+            : i === 6 ? l1Ref
+            : undefined
+
           return (
             <LayerBand
               key={layer.level}
@@ -104,7 +131,7 @@ export function ReceiverColumn({ activeIndex, onNext, phase, l1Ref, userText, hi
               detail={i === activeDisplayIndex ? currentLayer?.decapDetail : undefined}
               receiverDescription={layer.receiverDescription}
               variant="receiver"
-              bandRef={i === 6 ? l1Ref : undefined}
+              bandRef={mergedRef}
               highlight={highlightReceiverLayer === i}
             />
           )
@@ -112,10 +139,10 @@ export function ReceiverColumn({ activeIndex, onNext, phase, l1Ref, userText, hi
       </div>
       {canAdvance && (
         <button
-          onClick={onNext}
+          onClick={handleNext}
           className="mt-3 w-full py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 active:scale-95 transition-all"
         >
-          解封下一层 →
+          向上交付 →
         </button>
       )}
     </div>
