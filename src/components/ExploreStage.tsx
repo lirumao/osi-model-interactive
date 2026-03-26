@@ -2,6 +2,7 @@
 
 import { useRef } from 'react'
 import { useOsiState } from '@/hooks/useOsiState'
+import { OSI_LAYERS } from '@/data/osi-layers'
 import { SenderColumn } from './SenderColumn'
 import { ReceiverColumn } from './ReceiverColumn'
 import { TransmissionAnim } from './TransmissionAnim'
@@ -44,7 +45,27 @@ export function ExploreStage() {
       </div>
 
       {/* 间隔（传输动画穿越区域） */}
-      <div style={{ width: 120 }} />
+      <div style={{ width: 120 }} className="relative flex-shrink-0 flex flex-col items-center justify-center">
+        {/* 竖线 */}
+        <div className="absolute inset-y-0 left-1/2 w-px bg-gray-200 -translate-x-1/2" />
+        {/* 层进度指示器 */}
+        {state.phase !== 'transmitting' && (() => {
+          const isSending = state.phase === 'sending'
+          const layerIndex = isSending
+            ? state.senderActive
+            : (6 - state.receiverActive)
+          if (layerIndex < 0 || layerIndex > 6) return null
+          const layer = OSI_LAYERS[layerIndex]
+          return (
+            <div className="relative z-10 flex flex-col items-center gap-0.5 select-none">
+              <span className="text-indigo-400 text-xs leading-none">{isSending ? '↓' : '↑'}</span>
+              <div className="w-2 h-2 rounded-full bg-indigo-400" />
+              <span className="text-[9px] text-gray-500 leading-none">L{layer.level}</span>
+              <span className="text-[9px] text-gray-400 leading-none max-w-[60px] text-center truncate">{layer.name}</span>
+            </div>
+          )
+        })()}
+      </div>
 
       {/* 接收端 */}
       <div className="flex flex-col overflow-hidden flex-1 max-w-[600px]" style={{ padding: '16px 0 16px 12px' }}>

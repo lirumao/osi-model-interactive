@@ -138,7 +138,7 @@ export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], deta
           L{layer.level} · {layer.name}
         </div>
         <div className="text-[10px] text-gray-500 mt-0.5 leading-relaxed">
-          {detail ?? layer.description}
+          {layer.description}
         </div>
         <div className="flex flex-wrap gap-1 mt-1.5 justify-center">
           {layer.protocols.map((p) => (
@@ -170,6 +170,11 @@ export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], deta
                 </div>
               ))}
             </div>
+            {hasDetail && (
+              <div className="encap-detail text-[9px] text-gray-600 mt-1 text-center italic line-clamp-1 max-w-full px-1">
+                {detail}
+              </div>
+            )}
           </div>
         )}
       </div>
