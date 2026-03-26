@@ -25,9 +25,11 @@ interface LayerBandProps {
   variant?: 'sender' | 'receiver'
   replayKey?: number
   bandRef?: React.Ref<HTMLDivElement>
+  /** 为 true 时触发一次高亮闪烁动画 */
+  highlight?: boolean
 }
 
-export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], detail, variant = 'sender', replayKey = 0, bandRef }: LayerBandProps) {
+export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], detail, variant = 'sender', replayKey = 0, bandRef, highlight = false }: LayerBandProps) {
   const innerBandRef = useRef<HTMLDivElement>(null)
   const collapsedRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
@@ -101,6 +103,15 @@ export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], deta
 
     return () => { tl.kill() }
   }, [status, replayKey, expandedHeight])
+
+  useEffect(() => {
+    const band = innerBandRef.current
+    if (!band || !highlight) return
+    const tl = gsap.timeline()
+    tl.to(band, { boxShadow: '0 0 0 3px rgba(255,255,255,0.9), 0 0 12px 4px rgba(255,255,255,0.6)', duration: 0.15, ease: 'power2.out' })
+    tl.to(band, { boxShadow: '0 0 0 0px rgba(255,255,255,0)', duration: 0.35, ease: 'power2.in' })
+    return () => { tl.kill() }
+  }, [highlight])
 
   const bandOpacity = status === 'inactive' ? 0.4 : status === 'done' ? 0.85 : 1
 

@@ -13,6 +13,7 @@ interface Props {
   phase: Phase
   l1Ref?: React.RefObject<HTMLDivElement | null>
   userText: string
+  highlightReceiverLayer?: number | null
 }
 
 /**
@@ -43,7 +44,7 @@ function buildReceiverBlocks(receiverActive: number, userText: string): EncapBlo
   return blocks
 }
 
-export function ReceiverColumn({ activeIndex, onNext, phase, l1Ref, userText }: Props) {
+export function ReceiverColumn({ activeIndex, onNext, phase, l1Ref, userText, highlightReceiverLayer }: Props) {
   const canAdvance = phase === 'receiving' && activeIndex >= 0 && activeIndex < 7
 
   // 显示顺序同发送端：OSI_LAYERS (L7=index0 在上, L1=index6 在下)
@@ -102,6 +103,7 @@ export function ReceiverColumn({ activeIndex, onNext, phase, l1Ref, userText }: 
               detail={i === activeDisplayIndex ? currentLayer?.decapDetail : undefined}
               variant="receiver"
               bandRef={i === 6 ? l1Ref : undefined}
+              highlight={highlightReceiverLayer === i}
             />
           )
         })}

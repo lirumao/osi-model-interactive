@@ -54,6 +54,7 @@ export function ExploreStage() {
           phase={state.phase}
           l1Ref={receiverL1Ref}
           userText={state.userText}
+          highlightReceiverLayer={state.highlightReceiverLayer}
         />
       </div>
     </div>
