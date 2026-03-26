@@ -113,7 +113,7 @@ export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], deta
     return () => { tl.kill() }
   }, [highlight])
 
-  const bandOpacity = status === 'inactive' ? 0.4 : status === 'done' ? 0.85 : 1
+  const bandOpacity = status === 'done' ? 0.9 : 1
 
   return (
     <div

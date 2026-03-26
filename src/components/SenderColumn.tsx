@@ -27,7 +27,9 @@ function buildBlocks(upTo: number, userText: string): EncapBlock[] {
     const l = OSI_LAYERS[i]
     // 最右边（i=0，原始数据层）用 userText 替换
     const label = i === 0
-      ? (userText.length > 12 ? userText.slice(0, 12) + '…' : userText)
+      ? (userText.trim()
+          ? (userText.length > 12 ? userText.slice(0, 12) + '…' : userText)
+          : l.encapsulation)
       : l.encapsulation
     blocks.push({
       label,
@@ -48,6 +50,11 @@ export function SenderColumn({ activeIndex, onNext, phase, l1Ref, userText, onUs
         <div className="flex-1 h-px bg-gray-200" />
       </div>
       <DataCore variant="sender" userText={userText} onUserTextChange={onUserTextChange} />
+      {activeIndex === 0 && !userText.trim() && (
+        <p className="text-xs text-gray-400 text-center mb-2">
+          在上方输入内容，然后点击「下一层」开始封装
+        </p>
+      )}
       <div className="flex flex-col overflow-y-auto">
         {OSI_LAYERS.map((layer, i) => (
           <LayerBand

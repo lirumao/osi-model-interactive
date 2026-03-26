@@ -33,7 +33,9 @@ function buildReceiverBlocks(receiverActive: number, userText: string): EncapBlo
   for (let i = endIndex; i >= 0; i--) {
     const l = OSI_LAYERS[i]
     const label = i === 0
-      ? (userText.length > 12 ? userText.slice(0, 12) + '…' : userText)
+      ? (userText.trim()
+          ? (userText.length > 12 ? userText.slice(0, 12) + '…' : userText)
+          : l.encapsulation)
       : l.encapsulation
     blocks.push({
       label,
@@ -72,11 +74,10 @@ export function ReceiverColumn({ activeIndex, onNext, phase, l1Ref, userText, hi
         <div className="rounded-xl px-4 py-3 mb-3 border border-dashed border-gray-200 bg-gray-50/60">
           <div className="text-[10px] text-gray-300 mb-1">等待接收</div>
           {userText.trim() ? (
-            <div className="font-semibold text-xs text-gray-300 opacity-50">{userText}</div>
+            <div className="font-semibold text-xs text-gray-300 opacity-50 py-0.5">{userText}</div>
           ) : (
-            <div className="font-semibold text-xs text-gray-300">— — —</div>
+            <div className="font-semibold text-xs text-gray-300 py-0.5">— — —</div>
           )}
-          <div className="text-[10px] text-gray-300 mt-0.5">传输完成后开始解封</div>
         </div>
       )}
       <div className="flex flex-col overflow-y-auto">
