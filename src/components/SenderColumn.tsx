@@ -44,7 +44,7 @@ export function SenderColumn({ activeIndex, onNext, phase, l1Ref, userText, onUs
   const canAdvance = phase === 'sending' && activeIndex < 7
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col h-full">
       <div className="flex items-center gap-2 mb-3">
         <span className="text-xs font-semibold text-gray-500 tracking-widest uppercase">发送端</span>
         <div className="flex-1 h-px bg-gray-200" />
@@ -55,7 +55,7 @@ export function SenderColumn({ activeIndex, onNext, phase, l1Ref, userText, onUs
           在上方输入内容，然后点击「下一层」开始封装
         </p>
       )}
-      <div className="flex flex-col overflow-y-auto">
+      <div className="flex flex-col flex-1 overflow-y-auto">
         {OSI_LAYERS.map((layer, i) => (
           <LayerBand
             key={layer.level}

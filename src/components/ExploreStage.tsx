@@ -18,31 +18,29 @@ function LayerIndicator({ phase, senderActive, receiverActive }: {
   const isSending = phase === 'sending'
   // OSI_LAYERS index 0=L7, 6=L1
   return (
-    <div className="relative z-10 flex flex-col items-center gap-1 select-none py-2">
-      <span className="text-[8px] text-gray-400 mb-1">{isSending ? '封装' : '解封'}</span>
-      {OSI_LAYERS.map((layer, i) => {
-        // 发送端：activeIndex = senderActive，已完成 i < senderActive，当前 i === senderActive
-        // 接收端：从下往上，activeIndex = 6 - receiverActive，已完成 i > 6-receiverActive，当前 i === 6-receiverActive
-        const currentIdx = isSending ? senderActive : (6 - receiverActive)
-        const isDone = isSending ? i < currentIdx : i > currentIdx
-        const isActive = i === currentIdx
-        return (
-          <div key={layer.level} className="flex flex-col items-center">
-            <div
-              className={[
-                'w-2 h-2 rounded-full transition-all duration-300',
-                isActive ? 'bg-indigo-500 scale-125' : isDone ? 'bg-indigo-300' : 'bg-gray-200'
-              ].join(' ')}
-            />
-            {isActive && (
-              <span className="text-[7px] text-indigo-500 leading-none mt-0.5 max-w-[50px] text-center">
-                L{layer.level}
-              </span>
-            )}
-          </div>
-        )
-      })}
-      <span className="text-[8px] text-gray-300 mt-1">{isSending ? '↓' : '↑'}</span>
+    <div className="relative z-10 flex flex-col items-center select-none">
+      <span className="text-[8px] text-gray-400 mb-2">{isSending ? '封装↓' : '解封↑'}</span>
+      <div className="relative flex flex-col items-center gap-0">
+        <div className="absolute inset-x-1/2 top-1 bottom-1 w-px bg-gray-200 -translate-x-1/2" />
+        {OSI_LAYERS.map((layer, i) => {
+          const currentIdx = isSending ? senderActive : (6 - receiverActive)
+          const isDone = isSending ? i < currentIdx : i > currentIdx
+          const isActive = i === currentIdx
+          return (
+            <div key={layer.level} className="relative z-10 flex flex-col items-center" style={{ marginBottom: 6 }}>
+              <div className={[
+                'w-2.5 h-2.5 rounded-full border-2 transition-all duration-300',
+                isActive ? 'bg-indigo-500 border-indigo-500 scale-110' :
+                isDone ? 'bg-indigo-300 border-indigo-300' :
+                'bg-white border-gray-300'
+              ].join(' ')} />
+              {isActive && (
+                <span className="text-[7px] text-indigo-500 mt-0.5 leading-none">L{layer.level}</span>
+              )}
+            </div>
+          )
+        })}
+      </div>
     </div>
   )
 }
@@ -69,7 +67,7 @@ export function ExploreStage() {
   }
 
   return (
-    <div className="relative flex justify-center items-start h-full w-full px-[3%]">
+    <div className="relative flex justify-center items-center h-full w-full px-[3%]">
       {/* 传输动画 SVG 覆盖层 */}
       <TransmissionAnim
         playing={state.transmitting}
@@ -84,7 +82,7 @@ export function ExploreStage() {
       </div>
 
       {/* 间隔（传输动画穿越区域） */}
-      <div style={{ width: 120 }} className="relative flex-shrink-0 flex flex-col items-center justify-center">
+      <div style={{ width: 120 }} className="relative flex-shrink-0 self-stretch flex flex-col items-center justify-center">
         <div className="absolute inset-y-0 left-1/2 w-px bg-gray-200 -translate-x-1/2" />
         <LayerIndicator phase={state.phase} senderActive={state.senderActive} receiverActive={state.receiverActive} />
       </div>

@@ -80,7 +80,7 @@ export function ReceiverColumn({ activeIndex, onNext, phase, l1Ref, userText, hi
           )}
         </div>
       )}
-      <div className="flex flex-col overflow-y-auto">
+      <div className="flex flex-col flex-1 overflow-y-auto">
         {OSI_LAYERS.map((layer, i) => {
           let status: 'inactive' | 'active' | 'done'
           if (activeIndex < 0) {
