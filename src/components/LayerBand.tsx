@@ -146,7 +146,7 @@ export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], deta
           {layer.protocols.map((p) => (
             <span
               key={p}
-              className="text-[9px] px-1.5 py-0.5 bg-white/60 rounded-full text-gray-600 font-medium"
+              className="text-[10.5px] px-1.5 py-0.5 bg-white/60 rounded-full text-gray-600 font-medium"
             >
               {p}
             </span>
@@ -160,7 +160,7 @@ export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], deta
               {blocks.map((b, idx) => (
                 <div
                   key={idx}
-                  className="encap-block flex-shrink-0 flex items-center justify-center rounded text-[10px] font-semibold text-gray-700 whitespace-nowrap"
+                  className="encap-block flex-shrink-0 flex items-center justify-center rounded text-[11px] font-semibold text-gray-700 whitespace-nowrap"
                   style={{
                     height: 28,
                     padding: '0 10px',
@@ -173,7 +173,7 @@ export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], deta
               ))}
             </div>
             {hasDetail && detail !== layer.description && (
-              <div className="encap-detail text-[9px] text-gray-600 mt-1 text-center italic line-clamp-1 max-w-full px-1">
+              <div className="encap-detail text-[10px] text-gray-600 mt-1 text-center italic line-clamp-1 max-w-full px-1">
                 {detail}
               </div>
             )}

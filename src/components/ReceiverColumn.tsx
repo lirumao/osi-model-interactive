@@ -89,12 +89,12 @@ export function ReceiverColumn({ activeIndex, onNext, phase, l1Ref, userText, hi
         </div>
       ) : (
         /* 等待占位：与 DataCore 等高，不隐藏，给用户视觉反馈 */
-        <div className="rounded-xl px-4 py-3 mb-3 border border-dashed border-gray-200 bg-gray-50/60">
-          <div className="text-[10px] text-gray-300 mb-1">等待接收</div>
+        <div className="rounded-xl px-4 py-3 mb-3 border-2 border-dashed border-blue-400 bg-blue-100/70">
+          <div className="text-[10px] text-blue-600 font-semibold mb-1">等待接收</div>
           {userText.trim() ? (
-            <div className="font-semibold text-xs text-gray-300 opacity-50 py-0.5">{userText}</div>
+            <div className="font-semibold text-xs text-teal-800 opacity-50 py-0.5">{userText}</div>
           ) : (
-            <div className="font-semibold text-xs text-gray-300 py-0.5">— — —</div>
+            <div className="font-semibold text-xs text-teal-600 py-0.5">— — —</div>
           )}
         </div>
       )}
@@ -142,7 +142,7 @@ export function ReceiverColumn({ activeIndex, onNext, phase, l1Ref, userText, hi
           onClick={handleNext}
           className="mt-3 w-full py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 active:scale-95 transition-all"
         >
-          向上交付 →
+          向上交付解封装
         </button>
       )}
     </div>
