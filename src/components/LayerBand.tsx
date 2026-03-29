@@ -136,10 +136,10 @@ export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], deta
 
       {/* 展开态 */}
       <div ref={contentRef} className="px-3 pb-2 text-center" style={{ opacity: 0 }}>
-        <div className="text-[20px] font-bold text-gray-800 leading-tight mt-0.5">
+        <div className="text-[21px] font-bold text-gray-800 leading-tight -mt-0.5">
           L{layer.level} · {layer.name}
         </div>
-        <div style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }} className="text-[13px] font-medium text-gray-600 mt-0.5 leading-[1.5] tracking-[0.01em] opacity-90 text-center block w-full">
+        <div style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }} className="text-[15px] font-semibold text-gray-700 mt-0.5 leading-[1.5] tracking-[-0.01em] opacity-95 text-center block w-full">
           {variant === 'receiver' && receiverDescription ? receiverDescription : layer.description}
         </div>
         <div className="flex flex-wrap gap-1 mt-1.5 justify-center">
@@ -155,7 +155,7 @@ export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], deta
 
         {/* 封装方块行：水平排列，左=最新头部，右=原始数据 */}
         {hasBlocks && (
-          <div className="encap-row mt-2 flex flex-col items-center">
+          <div className="encap-row mt-1 flex flex-col items-center">
             <div className="flex items-center justify-center gap-1 flex-wrap">
               {blocks.map((b, idx) => (
                 <div
