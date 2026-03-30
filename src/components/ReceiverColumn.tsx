@@ -102,7 +102,7 @@ export function ReceiverColumn({ activeIndex, onNext, phase, l1Ref, userText, hi
       ) : activeIndex === 6 ? (
         /* L7 正在处理：已还原，显示正常样式 */
         <div className="rounded-xl px-4 py-3 mb-3 border border-emerald-300 bg-emerald-50/80">
-          <div className="text-[10px] text-emerald-600 font-semibold mb-1">已还原</div>
+          <div className="text-[10px] text-emerald-600 font-semibold mb-1">原始数据</div>
           <div className="font-semibold text-xs text-emerald-800">{userText}</div>
         </div>
       ) : (

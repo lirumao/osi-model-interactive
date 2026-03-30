@@ -74,8 +74,8 @@ export function SenderColumn({ activeIndex, onNext, phase, l1Ref, userText, onUs
       </div>
       <DataCore variant="sender" userText={userText} onUserTextChange={onUserTextChange} />
       {activeIndex === 0 && !userText.trim() && (
-        <p className="text-xs text-gray-400 text-center mb-2">
-          在上方输入内容，然后点击「下一层」开始封装
+        <p className="text-xs text-blue-600 font-semibold text-center mb-3 bg-blue-50/50 px-3 py-1.5 rounded-full mx-auto w-fit">
+          💡 先在上方输入数据，再点击各层的协议按钮切换不同协议
         </p>
       )}
       <div className="flex flex-col flex-1 overflow-y-auto">

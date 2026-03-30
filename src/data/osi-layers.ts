@@ -5,6 +5,10 @@ export interface ProtocolDetail {
   displayName: string
   /** 百科式详细说明，显示在 encap-detail 区域 */
   detail: string
+  /** 发送端视角的层功能描述（替换 layer.description） */
+  senderDesc?: string
+  /** 接收端视角的层功能描述（替换 layer.receiverDescription） */
+  receiverDesc?: string
 }
 
 export interface OsiLayer {
@@ -34,10 +38,30 @@ export const OSI_LAYERS: OsiLayer[] = [
     receiverDescription: '解析 HTTP 报文，将数据呈现给用户',
     protocols: ['HTTP', 'FTP', 'DNS', 'SMTP'],
     protocolDetails: {
-      HTTP: { displayName: 'HTTP 请求', detail: '超文本传输协议，定义客户端与服务器之间请求/响应的消息格式，是 Web 通信的基础。' },
-      FTP:  { displayName: 'FTP 数据', detail: '文件传输协议，通过控制连接（21端口）与数据连接（20端口）分离实现高效文件上传下载。' },
-      DNS:  { displayName: 'DNS 查询', detail: '域名系统，将人类可读的域名（如 example.com）解析为机器可识别的 IP 地址。' },
-      SMTP: { displayName: 'SMTP 邮件', detail: '简单邮件传输协议，定义邮件在服务器之间传递的规则，负责邮件的发送与中转。' },
+      HTTP: {
+        displayName: 'HTTP 请求',
+        detail: '超文本传输协议，定义客户端与服务器之间请求/响应的消息格式，是 Web 通信的基础。',
+        senderDesc: '将用户请求格式化为 HTTP 报文，包含请求行、首部字段与可选消息体',
+        receiverDesc: '解析 HTTP 响应报文，提取状态码与消息体，交付给应用程序',
+      },
+      FTP: {
+        displayName: 'FTP 数据',
+        detail: '文件传输协议，通过控制连接（21端口）与数据连接（20端口）分离实现高效文件上传下载。',
+        senderDesc: '通过控制连接发送 FTP 命令，通过数据连接传输文件内容',
+        receiverDesc: '解析 FTP 响应码，接收数据连接上的文件内容，完成文件传输',
+      },
+      DNS: {
+        displayName: 'DNS 查询',
+        detail: '域名系统，将人类可读的域名（如 example.com）解析为机器可识别的 IP 地址。',
+        senderDesc: '将域名封装为 DNS 查询报文，向递归解析器请求 IP 地址',
+        receiverDesc: '解析 DNS 应答报文，提取 A/AAAA 记录，将 IP 地址返回给请求方',
+      },
+      SMTP: {
+        displayName: 'SMTP 邮件',
+        detail: '简单邮件传输协议，定义邮件在服务器之间传递的规则，负责邮件的发送与中转。',
+        senderDesc: '封装邮件为 SMTP 命令序列（EHLO / MAIL FROM / RCPT TO / DATA）',
+        receiverDesc: '解析 SMTP 命令，验证收件人地址，将邮件内容存入邮箱',
+      },
     },
     encapsulation: 'HTTP 请求',
     encapDetail: '用户发起请求，HTTP 协议将其格式化为标准报文',
@@ -51,9 +75,24 @@ export const OSI_LAYERS: OsiLayer[] = [
     receiverDescription: '解密 TLS，还原统一编码格式',
     protocols: ['SSL/TLS', 'JPEG', 'ASCII'],
     protocolDetails: {
-      'SSL/TLS': { displayName: 'TLS 加密', detail: '传输层安全协议，通过非对称加密协商密钥，再用对称加密保护后续通信，防止窃听与篡改。' },
-      JPEG:      { displayName: 'JPEG 压缩', detail: '有损图像压缩标准，利用人眼对高频细节不敏感的特性大幅减小图像体积，适用于照片传输。' },
-      ASCII:     { displayName: 'ASCII 编码', detail: '美国标准信息交换码，将128个字符映射为7位二进制数，是文本数据统一编码的基础标准。' },
+      'SSL/TLS': {
+        displayName: 'TLS 加密',
+        detail: '传输层安全协议，通过非对称加密协商密钥，再用对称加密保护后续通信，防止窃听与篡改。',
+        senderDesc: 'TLS 握手协商会话密钥，对应用层数据加密并封装为 TLS Record',
+        receiverDesc: '验证 TLS Record 的 MAC，解密密文，将明文数据交付给应用层',
+      },
+      JPEG: {
+        displayName: 'JPEG 压缩',
+        detail: '有损图像压缩标准，利用人眼对高频细节不敏感的特性大幅减小图像体积，适用于照片传输。',
+        senderDesc: '对图像进行 DCT 变换、量化与哈夫曼编码，压缩为 JPEG 格式',
+        receiverDesc: '解码 JPEG 数据流，反量化与 IDCT 变换，还原像素矩阵',
+      },
+      ASCII: {
+        displayName: 'ASCII 编码',
+        detail: '美国标准信息交换码，将128个字符映射为7位二进制数，是文本数据统一编码的基础标准。',
+        senderDesc: '将文本字符编码为 ASCII 字节序列，统一不同系统间的数据格式',
+        receiverDesc: '将字节序列按 ASCII 解码，还原为可读字符串后交付应用层',
+      },
     },
     encapsulation: 'SSL 加密',
     encapDetail: '对数据加密（TLS）并统一编码格式（UTF-8/ASCII）',
@@ -67,8 +106,18 @@ export const OSI_LAYERS: OsiLayer[] = [
     receiverDescription: '验证会话 ID，维持连接状态',
     protocols: ['NetBIOS', 'RPC'],
     protocolDetails: {
-      NetBIOS: { displayName: 'NetBIOS 会话', detail: '网络基本输入输出系统，提供局域网内的名称解析与会话建立服务，是早期 Windows 网络共享的基础。' },
-      RPC:     { displayName: 'RPC 调用', detail: '远程过程调用，允许程序像调用本地函数一样调用远程服务器上的函数，屏蔽网络通信细节。' },
+      NetBIOS: {
+        displayName: 'NetBIOS 会话',
+        detail: '网络基本输入输出系统，提供局域网内的名称解析与会话建立服务，是早期 Windows 网络共享的基础。',
+        senderDesc: '广播名称注册，建立 NetBIOS 会话，分配本次通信的会话 ID',
+        receiverDesc: '验证 NetBIOS 会话 ID，确认对端名称，维持会话状态',
+      },
+      RPC: {
+        displayName: 'RPC 调用',
+        detail: '远程过程调用，允许程序像调用本地函数一样调用远程服务器上的函数，屏蔽网络通信细节。',
+        senderDesc: '序列化函数调用参数，封装为 RPC 请求消息，建立远程调用上下文',
+        receiverDesc: '反序列化 RPC 请求，在本地执行对应函数，封装返回值回传',
+      },
     },
     encapsulation: '会话 ID',
     encapDetail: '建立并维持连接会话，分配唯一会话 ID',
@@ -82,8 +131,18 @@ export const OSI_LAYERS: OsiLayer[] = [
     receiverDescription: '重组 TCP 分段，还原完整数据流',
     protocols: ['TCP', 'UDP'],
     protocolDetails: {
-      TCP: { displayName: 'TCP 首部', detail: '传输控制协议，提供三次握手建立连接、序列号确保有序传输、ACK 确认机制保证可靠交付。' },
-      UDP: { displayName: 'UDP 首部', detail: '用户数据报协议，无连接、无确认，延迟极低，适用于视频流、游戏、DNS 等对速度敏感的场景。' },
+      TCP: {
+        displayName: 'TCP 首部',
+        detail: '传输控制协议，提供三次握手建立连接、序列号确保有序传输、ACK 确认机制保证可靠交付。',
+        senderDesc: '切分数据为 MSS 大小的段，添加序列号与端口号，三次握手建立连接',
+        receiverDesc: '按序列号重组乱序数据段，发送 ACK 确认，去掉 TCP 首部后向上交付',
+      },
+      UDP: {
+        displayName: 'UDP 首部',
+        detail: '用户数据报协议，无连接、无确认，延迟极低，适用于视频流、游戏、DNS 等对速度敏感的场景。',
+        senderDesc: '封装为 UDP 数据报，仅添加端口号与校验和，无连接直接发送',
+        receiverDesc: '校验 UDP 校验和，按目标端口将载荷数据交付给对应应用',
+      },
     },
     encapsulation: 'TCP 首部',
     encapDetail: 'TCP 分段数据，添加端口号确保送达正确应用',
@@ -97,9 +156,24 @@ export const OSI_LAYERS: OsiLayer[] = [
     receiverDescription: '读取目标 IP，确认数据到达本机',
     protocols: ['IP', 'ICMP', 'ARP'],
     protocolDetails: {
-      IP:   { displayName: 'IP 首部', detail: '互联网协议，为每个数据包添加源/目标 IP 地址，路由器据此在不同网络间逐跳转发数据包。' },
-      ICMP: { displayName: 'ICMP 报文', detail: '互联网控制消息协议，用于网络诊断（如 ping）和错误报告（如"目标不可达"），不传输用户数据。' },
-      ARP:  { displayName: 'ARP 请求', detail: '地址解析协议，在已知 IP 地址的情况下广播查询对应的 MAC 地址，实现局域网内的地址映射。' },
+      IP: {
+        displayName: 'IP 首部',
+        detail: '互联网协议，为每个数据包添加源/目标 IP 地址，路由器据此在不同网络间逐跳转发数据包。',
+        senderDesc: '添加源/目标 IP 地址，设置 TTL 与协议字段，路由器据此逐跳转发',
+        receiverDesc: '验证目标 IP 为本机，检查 TTL，剥除 IP 首部后向传输层递交',
+      },
+      ICMP: {
+        displayName: 'ICMP 报文',
+        detail: '互联网控制消息协议，用于网络诊断（如 ping）和错误报告（如"目标不可达"），不传输用户数据。',
+        senderDesc: '封装 ICMP Echo Request 或错误通知消息，用于网络探测与路径诊断',
+        receiverDesc: '解析 ICMP 类型字段，响应 Echo Request 或记录错误信息',
+      },
+      ARP: {
+        displayName: 'ARP 请求',
+        detail: '地址解析协议，在已知 IP 地址的情况下广播查询对应的 MAC 地址，实现局域网内的地址映射。',
+        senderDesc: '广播 ARP 请求帧，查询目标 IP 地址对应的 MAC 地址',
+        receiverDesc: '响应 ARP 请求，回复本机 MAC 地址，缓存对端 IP/MAC 映射',
+      },
     },
     encapsulation: 'IP 首部',
     encapDetail: '添加源/目标 IP，路由器据此决定转发路径',
@@ -113,9 +187,24 @@ export const OSI_LAYERS: OsiLayer[] = [
     receiverDescription: '校验 MAC 地址，剥除帧头',
     protocols: ['Ethernet', 'Wi-Fi', 'PPP'],
     protocolDetails: {
-      Ethernet: { displayName: 'MAC 帧头', detail: '以太网协议，将数据封装为帧并附加源/目标 MAC 地址与 CRC 校验码，保障局域网内相邻节点的可靠传输。' },
-      'Wi-Fi':  { displayName: 'Wi-Fi 帧头', detail: '无线局域网标准（IEEE 802.11），通过无线电波传输帧，增加了认证和加密字段以保护无线信道安全。' },
-      PPP:      { displayName: 'PPP 帧头', detail: '点对点协议，用于两台设备之间的直连通信，提供认证、压缩和多协议封装，常用于宽带拨号连接。' },
+      Ethernet: {
+        displayName: 'MAC 首部',
+        detail: '以太网协议，将数据封装为帧并附加源/目标 MAC 地址与 CRC 校验码，保障局域网内相邻节点的可靠传输。',
+        senderDesc: '封装为以太网帧，添加目标/源 MAC 地址、EtherType 字段与 FCS 校验码',
+        receiverDesc: '校验 FCS 完整性，验证目标 MAC 地址，剥除以太网帧头尾',
+      },
+      'Wi-Fi': {
+        displayName: 'Wi-Fi 帧头',
+        detail: '无线局域网标准（IEEE 802.11），通过无线电波传输帧，增加了认证和加密字段以保护无线信道安全。',
+        senderDesc: '封装为 802.11 帧，添加 BSSID 与序列控制字段，CCMP 加密帧体',
+        receiverDesc: '解密 CCMP，校验帧完整性，验证 BSSID，剥除 802.11 帧头',
+      },
+      PPP: {
+        displayName: 'PPP 帧头',
+        detail: '点对点协议，用于两台设备之间的直连通信，提供认证、压缩和多协议封装，常用于宽带拨号连接。',
+        senderDesc: '封装为 PPP 帧，添加标志字节（0x7E）、协议字段与 FCS 尾部',
+        receiverDesc: '校验 PPP FCS，剥除标志字节与协议字段，提取网络层数据包',
+      },
     },
     encapsulation: 'MAC 首部',
     encapDetail: '封装成帧，MAC 地址确保在局域网内正确投递',
@@ -129,9 +218,24 @@ export const OSI_LAYERS: OsiLayer[] = [
     receiverDescription: '接收物理信号，还原为比特流',
     protocols: ['RJ45', '光纤', '802.11'],
     protocolDetails: {
-      RJ45:   { displayName: '电信号', detail: 'RJ45 双绞线接口，通过铜线传输差分电压信号，支持最高 10 Gbps，是有线以太网最常见的物理介质。' },
-      '光纤': { displayName: '光信号', detail: '利用光的全内反射在玻璃纤维中传输数据，带宽极高、损耗极低，是骨干网与跨洋通信的核心介质。' },
-      '802.11': { displayName: '无线电波', detail: 'Wi-Fi 物理层标准，将比特流调制为 2.4GHz/5GHz/6GHz 无线电波，通过天线在空气中传播。' },
+      RJ45: {
+        displayName: '电信号',
+        detail: 'RJ45 双绞线接口，通过铜线传输差分电压信号，支持最高 10 Gbps，是有线以太网最常见的物理介质。',
+        senderDesc: '将比特流编码为差分电压信号，通过双绞线铜缆向外发送',
+        receiverDesc: '接收双绞线上的电压信号，均衡放大后解码为数字比特流',
+      },
+      '光纤': {
+        displayName: '光信号',
+        detail: '利用光的全内反射在玻璃纤维中传输数据，带宽极高、损耗极低，是骨干网与跨洋通信的核心介质。',
+        senderDesc: '将比特流调制为激光脉冲，通过光纤以光速传输',
+        receiverDesc: '光电探测器接收光脉冲，经跨阻放大器转换后解码为比特流',
+      },
+      '802.11': {
+        displayName: '无线电波',
+        detail: 'Wi-Fi 物理层标准，将比特流调制为 2.4GHz/5GHz/6GHz 无线电波，通过天线在空气中传播。',
+        senderDesc: '将比特流经 OFDM 调制编码为射频信号，通过天线发射',
+        receiverDesc: '天线接收射频信号，经 ADC 采样与 OFDM 解调，还原为比特流',
+      },
     },
     encapsulation: '',
     encapDetail: '比特流通过 RJ45/光纤/802.11 转为物理信号发送',

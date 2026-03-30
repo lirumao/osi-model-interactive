@@ -174,8 +174,17 @@ export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], deta
         <div className="text-[21px] font-bold text-gray-800 leading-tight -mt-0.5">
           L{layer.level} · {layer.name}
         </div>
-        <div style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }} className="text-[15px] font-semibold text-gray-700 mt-0.5 leading-[1.5] tracking-[-0.01em] opacity-95 text-center block w-full">
-          {variant === 'receiver' && receiverDescription ? receiverDescription : layer.description}
+        <div
+          style={{
+            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            transition: 'opacity 0.15s ease',
+            opacity: detailFade ? 1 : 0,
+          }}
+          className="text-[15px] font-semibold text-gray-700 mt-0.5 leading-[1.5] tracking-[-0.01em] opacity-95 text-center block w-full"
+        >
+          {variant === 'receiver'
+            ? (protocolInfo?.receiverDesc ?? receiverDescription ?? layer.receiverDescription)
+            : (protocolInfo?.senderDesc ?? layer.description)}
         </div>
         <div className="flex flex-wrap gap-1 mt-1.5 justify-center">
           {layer.protocols.map((p) => {
@@ -207,15 +216,15 @@ export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], deta
 
         {/* 封装方块行：水平排列，左=最新头部，右=原始数据 */}
         {hasBlocks && (
-          <div className="encap-row mt-1 flex flex-col items-center">
-            <div className="flex items-center justify-center gap-1 flex-wrap">
+          <div className="encap-row mt-1 flex flex-col items-center mx-[-12px]">
+            <div className="flex items-center justify-center gap-0.5 flex-nowrap overflow-x-auto w-full">
               {displayBlocks.map((b, idx) => (
                 <div
                   key={idx}
                   className="encap-block flex-shrink-0 flex items-center justify-center rounded text-[11px] font-semibold text-gray-700 whitespace-nowrap"
                   style={{
                     height: 28,
-                    padding: '0 10px',
+                    padding: '0 7px',
                     background: `linear-gradient(135deg, ${b.colorFrom}, ${b.colorTo})`,
                     border: '1px solid rgba(255,255,255,0.6)',
                     transition: 'opacity 0.15s ease',
