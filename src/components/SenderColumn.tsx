@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { OSI_LAYERS } from '@/data/osi-layers'
 import { LayerBand } from './LayerBand'
 import type { EncapBlock } from './LayerBand'
@@ -17,31 +17,54 @@ interface Props {
 }
 
 /**
- * 构建到第 layerIndex 层为止的水平封装方块
- * 最新的头部在最左边，原始数据在最右边
- * 最右边一块的 label 显示 userText（截断到 12 字符）
+ * 构建到第 layerIndex 层为止的水平封装方块。
+ * selectedProtocols: 每层用户已选中的协议名（index 对应 OSI_LAYERS）。
+ * 用选中协议的 displayName 作为该层载荷标签，使高层选择能级联到低层。
  */
-function buildBlocks(upTo: number, userText: string): EncapBlock[] {
+function buildBlocks(
+  upTo: number,
+  userText: string,
+  selectedProtocols: Record<number, string>,
+): EncapBlock[] {
   const blocks: EncapBlock[] = []
   for (let i = upTo; i >= 0; i--) {
     const l = OSI_LAYERS[i]
-    // 最右边（i=0，原始数据层）用 userText 替换
-    const label = i === 0
-      ? (userText.trim()
-          ? (userText.length > 12 ? userText.slice(0, 12) + '…' : userText)
-          : l.encapsulation)
-      : l.encapsulation
+    let label: string
+    if (i === 0) {
+      // 原始数据：显示用户输入文字；无输入时用 L7 选中协议的 displayName
+      label = userText.trim()
+        ? (userText.length > 12 ? userText.slice(0, 12) + '…' : userText)
+        : (l.protocolDetails?.[selectedProtocols[i] ?? l.protocols[0]]?.displayName ?? l.encapsulation)
+    } else {
+      // 已封装层：用该层选中协议的 displayName，体现用户的协议选择
+      const chosen = selectedProtocols[i] ?? l.protocols[0]
+      label = l.protocolDetails?.[chosen]?.displayName ?? l.encapsulation
+    }
     if (label) blocks.push({
       label,
       colorFrom: l.senderColor.from,
       colorTo: l.senderColor.to,
     })
   }
+  // L2 数据链路层封装时追加 FCS 尾部
+  if (upTo >= 5) {
+    const l2 = OSI_LAYERS[5]
+    blocks.push({ label: 'FCS 校验', colorFrom: l2.senderColor.from, colorTo: l2.senderColor.to })
+  }
   return blocks
 }
 
 export function SenderColumn({ activeIndex, onNext, phase, l1Ref, userText, onUserTextChange }: Props) {
   const canAdvance = phase === 'sending' && activeIndex < 7
+
+  // 每层选中的协议，key = OSI_LAYERS index，初始为各层第一个协议
+  const [selectedProtocols, setSelectedProtocols] = useState<Record<number, string>>(
+    () => Object.fromEntries(OSI_LAYERS.map((l, i) => [i, l.protocols[0]]))
+  )
+
+  const handleProtocolChange = (layerIndex: number, protocol: string) => {
+    setSelectedProtocols(prev => ({ ...prev, [layerIndex]: protocol }))
+  }
 
   return (
     <div className="flex flex-col h-full">
@@ -63,8 +86,10 @@ export function SenderColumn({ activeIndex, onNext, phase, l1Ref, userText, onUs
             status={i < activeIndex ? 'done' : i === activeIndex ? 'active' : 'inactive'}
             colorFrom={layer.senderColor.from}
             colorTo={layer.senderColor.to}
-            blocks={i === activeIndex ? buildBlocks(i, userText) : []}
+            blocks={i === activeIndex ? buildBlocks(i, userText, selectedProtocols) : []}
             detail={i === activeIndex ? layer.encapDetail : undefined}
+            activeProtocol={selectedProtocols[i]}
+            onProtocolChange={(p) => handleProtocolChange(i, p)}
             bandRef={i === 6 ? l1Ref : undefined}
           />
         ))}

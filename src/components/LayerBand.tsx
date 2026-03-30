@@ -21,6 +21,10 @@ interface LayerBandProps {
   blocks?: EncapBlock[]
   /** 当前层封装的说明文字 */
   detail?: string
+  /** 受控：当前选中的协议名；不传则内部自管理 */
+  activeProtocol?: string
+  /** 受控：协议切换回调 */
+  onProtocolChange?: (protocol: string) => void
   /** 接收端视角的层描述（展开态替换 layer.description） */
   receiverDescription?: string
   /** sender=新方块弹入, receiver=旧方块消失 */
@@ -33,33 +37,36 @@ interface LayerBandProps {
   highlight?: boolean
 }
 
-export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], detail, receiverDescription, variant = 'sender', replayKey = 0, bandRef, highlight = false, lockDetail = false }: LayerBandProps) {
+export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], detail, activeProtocol: controlledProtocol, onProtocolChange, receiverDescription, variant = 'sender', replayKey = 0, bandRef, highlight = false, lockDetail = false }: LayerBandProps) {
   const innerBandRef = useRef<HTMLDivElement>(null)
   const collapsedRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
 
-  const [activeProtocol, setActiveProtocol] = useState(layer.protocols[0])
+  // 非受控回退：仅在父组件未提供 activeProtocol 时使用
+  const [internalProtocol, setInternalProtocol] = useState(layer.protocols[0])
+  const activeProtocol = controlledProtocol ?? internalProtocol
   const [detailFade, setDetailFade] = useState(true)
 
-  // 激活层切换时重置协议选择
+  // 非受控模式下，激活层切换时重置
   useEffect(() => {
-    if (status === 'active') setActiveProtocol(layer.protocols[0])
-  }, [status, layer.protocols])
+    if (!controlledProtocol && status === 'active') setInternalProtocol(layer.protocols[0])
+  }, [controlledProtocol, status, layer.protocols])
 
   const handleProtocolClick = (protocol: string) => {
     if (protocol === activeProtocol) return
     setDetailFade(false)
     setTimeout(() => {
-      setActiveProtocol(protocol)
+      if (onProtocolChange) onProtocolChange(protocol)
+      else setInternalProtocol(protocol)
       setDetailFade(true)
     }, 150)
   }
 
   const protocolInfo = layer.protocolDetails?.[activeProtocol]
-  const activeDisplayName = protocolInfo?.displayName
   const activeDetail = (!lockDetail && protocolInfo?.detail) ? protocolInfo.detail : detail
 
-  // 用协议选中的 displayName 替换第一个封装方块的 label
+  // 用协议选中的 displayName 替换第一个封装方块的 label（当前层头部）
+  const activeDisplayName = protocolInfo?.displayName
   const displayBlocks = activeDisplayName && blocks.length > 0
     ? [{ ...blocks[0], label: activeDisplayName }, ...blocks.slice(1)]
     : blocks

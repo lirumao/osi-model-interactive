@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import gsap from 'gsap'
 import { OSI_LAYERS } from '@/data/osi-layers'
 import { LayerBand } from './LayerBand'
@@ -18,13 +18,14 @@ interface Props {
 }
 
 /**
- * 接收端方块：显示剩余未解封的封装
- * receiverActive=0 (L1 active): 7 个（全部）
- * receiverActive=1 (L2 active): 6 个（去掉 L1 比特流）
- * ...
- * receiverActive=6 (L7 active): 1 个（只剩 HTTP 请求）
+ * 接收端方块：显示剩余未解封的封装。
+ * selectedProtocols: 每层选中的协议，用于将该层的 displayName 显示到对应载荷方块上。
  */
-function buildReceiverBlocks(receiverActive: number, userText: string): EncapBlock[] {
+function buildReceiverBlocks(
+  receiverActive: number,
+  userText: string,
+  selectedProtocols: Record<number, string>,
+): EncapBlock[] {
   if (receiverActive < 0) return []
   // OSI_LAYERS: [L7(0), L6(1), ..., L1(6)]
   // 当前解封层在 OSI_LAYERS 的 index = 6 - receiverActive
@@ -33,16 +34,25 @@ function buildReceiverBlocks(receiverActive: number, userText: string): EncapBlo
   const blocks: EncapBlock[] = []
   for (let i = endIndex; i >= 0; i--) {
     const l = OSI_LAYERS[i]
-    const label = i === 0
-      ? (userText.trim()
-          ? (userText.length > 12 ? userText.slice(0, 12) + '…' : userText)
-          : l.encapsulation)
-      : l.encapsulation
+    let label: string
+    if (i === 0) {
+      label = userText.trim()
+        ? (userText.length > 12 ? userText.slice(0, 12) + '…' : userText)
+        : (l.protocolDetails?.[selectedProtocols[i] ?? l.protocols[0]]?.displayName ?? l.encapsulation)
+    } else {
+      const chosen = selectedProtocols[i] ?? l.protocols[0]
+      label = l.protocolDetails?.[chosen]?.displayName ?? l.encapsulation
+    }
     if (label) blocks.push({
       label,
       colorFrom: l.receiverColor.from,
       colorTo: l.receiverColor.to,
     })
+  }
+  // L2 尚未解封时保留 FCS 尾部（endIndex >= 5 表示 L2 块仍在）
+  if (endIndex >= 5) {
+    const l2 = OSI_LAYERS[5]
+    blocks.push({ label: 'FCS 校验', colorFrom: l2.receiverColor.from, colorTo: l2.receiverColor.to })
   }
   return blocks
 }
@@ -50,6 +60,14 @@ function buildReceiverBlocks(receiverActive: number, userText: string): EncapBlo
 export function ReceiverColumn({ activeIndex, onNext, phase, l1Ref, userText, highlightReceiverLayer }: Props) {
   const canAdvance = phase === 'receiving' && activeIndex >= 0 && activeIndex < 7
   const activeLayerRef = useRef<HTMLDivElement>(null)
+
+  const [selectedProtocols, setSelectedProtocols] = useState<Record<number, string>>(
+    () => Object.fromEntries(OSI_LAYERS.map((l, i) => [i, l.protocols[0]]))
+  )
+
+  const handleProtocolChange = (layerIndex: number, protocol: string) => {
+    setSelectedProtocols(prev => ({ ...prev, [layerIndex]: protocol }))
+  }
 
   // 显示顺序同发送端：OSI_LAYERS (L7=index0 在上, L1=index6 在下)
   // receiverActive=0 → L1 active → 显示 index 6 active
@@ -127,8 +145,10 @@ export function ReceiverColumn({ activeIndex, onNext, phase, l1Ref, userText, hi
               status={status}
               colorFrom={layer.receiverColor.from}
               colorTo={layer.receiverColor.to}
-              blocks={i === activeDisplayIndex ? buildReceiverBlocks(activeIndex, userText) : []}
+              blocks={i === activeDisplayIndex ? buildReceiverBlocks(activeIndex, userText, selectedProtocols) : []}
               detail={i === activeDisplayIndex ? currentLayer?.decapDetail : undefined}
+              activeProtocol={selectedProtocols[i]}
+              onProtocolChange={(p) => handleProtocolChange(i, p)}
               receiverDescription={layer.receiverDescription}
               variant="receiver"
               lockDetail
