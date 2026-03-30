@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import type { OsiLayer } from '@/data/osi-layers'
 
@@ -35,6 +35,32 @@ export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], deta
   const innerBandRef = useRef<HTMLDivElement>(null)
   const collapsedRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
+
+  const [activeProtocol, setActiveProtocol] = useState(layer.protocols[0])
+  const [detailFade, setDetailFade] = useState(true)
+
+  // 激活层切换时重置协议选择
+  useEffect(() => {
+    if (status === 'active') setActiveProtocol(layer.protocols[0])
+  }, [status, layer.protocols])
+
+  const handleProtocolClick = (protocol: string) => {
+    if (protocol === activeProtocol) return
+    setDetailFade(false)
+    setTimeout(() => {
+      setActiveProtocol(protocol)
+      setDetailFade(true)
+    }, 150)
+  }
+
+  const protocolInfo = layer.protocolDetails?.[activeProtocol]
+  const activeDisplayName = protocolInfo?.displayName
+  const activeDetail = protocolInfo?.detail ?? detail
+
+  // 用协议选中的 displayName 替换第一个封装方块的 label
+  const displayBlocks = activeDisplayName && blocks.length > 0
+    ? [{ ...blocks[0], label: activeDisplayName }, ...blocks.slice(1)]
+    : blocks
 
   const mergedBandRef = (el: HTMLDivElement | null) => {
     innerBandRef.current = el
@@ -120,7 +146,7 @@ export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], deta
   return (
     <div
       ref={mergedBandRef}
-      className="w-full rounded-lg overflow-hidden mb-1 select-none"
+      className="relative w-full rounded-lg overflow-hidden mb-1 select-none"
       style={{
         background: `linear-gradient(135deg, ${colorFrom}, ${colorTo})`,
         opacity: bandOpacity,
@@ -128,14 +154,14 @@ export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], deta
         height: 28,
       }}
     >
-      {/* 折叠态 */}
-      <div ref={collapsedRef} className="flex items-center justify-center gap-1.5 px-3" style={{ height: 28 }}>
+      {/* 折叠态（absolute 定位，不占文档流，展开时淡出） */}
+      <div ref={collapsedRef} className="absolute inset-x-0 flex items-center justify-center gap-1.5 px-3" style={{ height: 28 }}>
         <span className="text-[11px] font-semibold text-gray-700">L{layer.level}</span>
         <span className="text-[11px] text-gray-600">{layer.name}</span>
       </div>
 
       {/* 展开态 */}
-      <div ref={contentRef} className="px-3 pb-2 text-center" style={{ opacity: 0 }}>
+      <div ref={contentRef} className="px-3 pt-2 pb-2 text-center" style={{ opacity: 0 }}>
         <div className="text-[21px] font-bold text-gray-800 leading-tight -mt-0.5">
           L{layer.level} · {layer.name}
         </div>
@@ -143,21 +169,38 @@ export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], deta
           {variant === 'receiver' && receiverDescription ? receiverDescription : layer.description}
         </div>
         <div className="flex flex-wrap gap-1 mt-1.5 justify-center">
-          {layer.protocols.map((p) => (
-            <span
-              key={p}
-              className="text-[10.5px] px-1.5 py-0.5 bg-white/60 rounded-full text-gray-600 font-medium"
-            >
-              {p}
-            </span>
-          ))}
+          {layer.protocols.map((p) => {
+            const hasDetails = !!layer.protocolDetails
+            const isActive = p === activeProtocol
+            return hasDetails ? (
+              <button
+                key={p}
+                onClick={() => handleProtocolClick(p)}
+                className={[
+                  'text-[10.5px] px-3 py-1 rounded-full transition-all cursor-pointer',
+                  isActive
+                    ? 'bg-indigo-600 text-white shadow-md'
+                    : 'bg-white/40 hover:bg-white/60 text-gray-600 font-medium',
+                ].join(' ')}
+              >
+                {p}
+              </button>
+            ) : (
+              <span
+                key={p}
+                className="text-[10.5px] px-1.5 py-0.5 bg-white/60 rounded-full text-gray-600 font-medium"
+              >
+                {p}
+              </span>
+            )
+          })}
         </div>
 
         {/* 封装方块行：水平排列，左=最新头部，右=原始数据 */}
         {hasBlocks && (
           <div className="encap-row mt-1 flex flex-col items-center">
             <div className="flex items-center justify-center gap-1 flex-wrap">
-              {blocks.map((b, idx) => (
+              {displayBlocks.map((b, idx) => (
                 <div
                   key={idx}
                   className="encap-block flex-shrink-0 flex items-center justify-center rounded text-[11px] font-semibold text-gray-700 whitespace-nowrap"
@@ -166,15 +209,20 @@ export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], deta
                     padding: '0 10px',
                     background: `linear-gradient(135deg, ${b.colorFrom}, ${b.colorTo})`,
                     border: '1px solid rgba(255,255,255,0.6)',
+                    transition: 'opacity 0.15s ease',
+                    opacity: detailFade ? 1 : 0,
                   }}
                 >
                   {b.label}
                 </div>
               ))}
             </div>
-            {hasDetail && detail !== layer.description && (
-              <div className="encap-detail text-[10px] text-gray-600 mt-1 text-center italic line-clamp-1 max-w-full px-1">
-                {detail}
+            {hasDetail && (
+              <div
+                className="encap-detail text-[10px] text-gray-600 mt-1 text-center italic line-clamp-2 max-w-full px-1"
+                style={{ transition: 'opacity 0.15s ease', opacity: detailFade ? 1 : 0 }}
+              >
+                {activeDetail}
               </div>
             )}
           </div>
