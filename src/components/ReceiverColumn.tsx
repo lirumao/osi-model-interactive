@@ -131,6 +131,7 @@ export function ReceiverColumn({ activeIndex, onNext, phase, l1Ref, userText, hi
               detail={i === activeDisplayIndex ? currentLayer?.decapDetail : undefined}
               receiverDescription={layer.receiverDescription}
               variant="receiver"
+              lockDetail
               bandRef={mergedRef}
               highlight={highlightReceiverLayer === i}
             />

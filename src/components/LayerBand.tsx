@@ -25,13 +25,15 @@ interface LayerBandProps {
   receiverDescription?: string
   /** sender=新方块弹入, receiver=旧方块消失 */
   variant?: 'sender' | 'receiver'
+  /** 为 true 时协议按钮只切换封装方块 label，不替换 detail 文字（接收端用） */
+  lockDetail?: boolean
   replayKey?: number
   bandRef?: React.Ref<HTMLDivElement>
   /** 为 true 时触发一次高亮闪烁动画 */
   highlight?: boolean
 }
 
-export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], detail, receiverDescription, variant = 'sender', replayKey = 0, bandRef, highlight = false }: LayerBandProps) {
+export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], detail, receiverDescription, variant = 'sender', replayKey = 0, bandRef, highlight = false, lockDetail = false }: LayerBandProps) {
   const innerBandRef = useRef<HTMLDivElement>(null)
   const collapsedRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
@@ -55,7 +57,7 @@ export function LayerBand({ layer, status, colorFrom, colorTo, blocks = [], deta
 
   const protocolInfo = layer.protocolDetails?.[activeProtocol]
   const activeDisplayName = protocolInfo?.displayName
-  const activeDetail = protocolInfo?.detail ?? detail
+  const activeDetail = (!lockDetail && protocolInfo?.detail) ? protocolInfo.detail : detail
 
   // 用协议选中的 displayName 替换第一个封装方块的 label
   const displayBlocks = activeDisplayName && blocks.length > 0
