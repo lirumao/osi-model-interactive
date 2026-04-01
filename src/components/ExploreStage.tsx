@@ -94,6 +94,7 @@ export function ExploreStage() {
     advanceSender,
     onTransmissionComplete,
     advanceReceiver,
+    completeReceiving,
     reset,
     setUserText,
   } = useOsiState()
@@ -131,6 +132,7 @@ export function ExploreStage() {
         <ReceiverColumn
           activeIndex={state.phase === 'receiving' ? state.receiverActive : -1}
           onNext={advanceReceiver}
+          onComplete={completeReceiving}
           phase={state.phase}
           l1Ref={receiverL1Ref}
           userText={state.userText}

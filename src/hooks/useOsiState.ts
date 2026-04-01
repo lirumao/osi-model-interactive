@@ -20,7 +20,7 @@ export interface OsiState {
 
 const INITIAL: OsiState = {
   phase: 'sending',
-  senderActive: 0,
+  senderActive: -1,
   receiverActive: -1,
   transmitting: false,
   userText: '',
@@ -72,8 +72,16 @@ export function useOsiState() {
     setState((prev) => {
       if (prev.phase !== 'receiving') return prev
       const next = prev.receiverActive + 1
-      if (next >= 7) return { ...prev, receiverActive: 7, phase: 'complete' }
+      if (next >= 7) return { ...prev, receiverActive: 7 }
       return { ...prev, receiverActive: next }
+    })
+  }, [])
+
+  // 用户在接收端数据显示后，手动触发完成
+  const completeReceiving = useCallback(() => {
+    setState((prev) => {
+      if (prev.phase !== 'receiving' || prev.receiverActive < 7) return prev
+      return { ...prev, phase: 'complete' }
     })
   }, [])
 
@@ -84,5 +92,5 @@ export function useOsiState() {
   // 重置到初始状态
   const reset = useCallback(() => setState(INITIAL), [])
 
-  return { state, advanceSender, onTransmissionComplete, advanceReceiver, reset, setUserText }
+  return { state, advanceSender, onTransmissionComplete, advanceReceiver, completeReceiving, reset, setUserText }
 }

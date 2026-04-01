@@ -73,7 +73,7 @@ export function SenderColumn({ activeIndex, onNext, phase, l1Ref, userText, onUs
         <div className="flex-1 h-px bg-gray-200" />
       </div>
       <DataCore variant="sender" userText={userText} onUserTextChange={onUserTextChange} />
-      {activeIndex === 0 && !userText.trim() && (
+      {activeIndex <= 0 && !userText.trim() && (
         <p className="text-xs text-blue-600 font-semibold text-center mb-3 bg-blue-50/50 px-3 py-1.5 rounded-full mx-auto w-fit">
           💡 先在上方输入数据，再点击各层的协议按钮切换不同协议
         </p>
@@ -99,7 +99,7 @@ export function SenderColumn({ activeIndex, onNext, phase, l1Ref, userText, onUs
           onClick={onNext}
           className="mt-3 w-full py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 active:scale-95 transition-all"
         >
-          下一层 →
+          {activeIndex === -1 ? '开始封装 →' : '下一层 →'}
         </button>
       )}
     </div>

@@ -11,6 +11,7 @@ import type { Phase } from '@/hooks/useOsiState'
 interface Props {
   activeIndex: number  // 0=L1 active, 1=L2 active, ..., 6=L7 active, 7=done
   onNext: () => void
+  onComplete: () => void
   phase: Phase
   l1Ref?: React.RefObject<HTMLDivElement | null>
   userText: string
@@ -57,7 +58,7 @@ function buildReceiverBlocks(
   return blocks
 }
 
-export function ReceiverColumn({ activeIndex, onNext, phase, l1Ref, userText, highlightReceiverLayer }: Props) {
+export function ReceiverColumn({ activeIndex, onNext, onComplete, phase, l1Ref, userText, highlightReceiverLayer }: Props) {
   const canAdvance = phase === 'receiving' && activeIndex >= 0 && activeIndex < 7
   const activeLayerRef = useRef<HTMLDivElement>(null)
 
@@ -110,7 +111,7 @@ export function ReceiverColumn({ activeIndex, onNext, phase, l1Ref, userText, hi
         <div className="rounded-xl px-4 py-3 mb-3 border-2 border-dashed border-blue-400 bg-blue-100/70">
           <div className="text-[10px] text-blue-600 font-semibold mb-1">等待接收</div>
           {userText.trim() ? (
-            <div className="font-semibold text-xs text-teal-800 opacity-50 py-0.5">{userText}</div>
+            <div className="font-semibold text-xs text-gray-300 py-0.5">{userText}</div>
           ) : (
             <div className="font-semibold text-xs text-teal-600 py-0.5">— — —</div>
           )}
@@ -164,6 +165,14 @@ export function ReceiverColumn({ activeIndex, onNext, phase, l1Ref, userText, hi
           className="mt-3 w-full py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 active:scale-95 transition-all"
         >
           向上交付解封装
+        </button>
+      )}
+      {activeIndex >= 7 && phase === 'receiving' && (
+        <button
+          onClick={onComplete}
+          className="mt-3 w-full py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 active:scale-95 transition-all"
+        >
+          查看完整回顾 →
         </button>
       )}
     </div>
